@@ -1,39 +1,16 @@
 import { TextAreaProps, Textarea } from "@nextui-org/react";
-import { useEffect, useState } from "react";
 
-export default function TextareaInput({
-  actionData,
-  ...props
-}: TextAreaProps & { actionData?: any }) {
-  const [inputActionData, setInputActionData] = useState<typeof actionData>();
-
-  useEffect(() => {
-    if (actionData) {
-      setInputActionData(actionData);
-    }
-  }, [actionData]);
+export default function TextareaInput({ ...props }: TextAreaProps) {
   return (
     <Textarea
-      color="primary"
+      color="success"
       labelPlacement="outside"
       placeholder=" "
       variant="bordered"
       classNames={{
-        label: "font-sen font-semibold text-slate-700 dark:text-white",
-        base: "shadow-none font-nunito",
+        label: "font-montserrat font-semibold text-slate-700 dark:text-white",
+        base: "shadow-none font-quicksand",
       }}
-      isInvalid={
-        inputActionData?.errors &&
-        inputActionData?.errors.find((input: any) => input.field === props.name)
-          ? true
-          : false
-      }
-      errorMessage={
-        inputActionData?.errors &&
-        inputActionData?.errors.find((input: any) => input.field === props.name)
-          ?.message
-      }
-      onChange={() => setInputActionData(undefined)}
       {...props}
     />
   );

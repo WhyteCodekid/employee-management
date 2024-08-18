@@ -67,7 +67,7 @@ const CreateRecordModal = ({
       backdrop="opaque"
       scrollBehavior="inside"
       classNames={{
-        base: "rounded-3xl dark:bg-slate-900 border-[1px] dark:border-slate-700/20",
+        base: "rounded-3xl border-[1px] dark:border-slate-700/20",
       }}
       motionProps={{
         variants: {
@@ -117,11 +117,11 @@ const CreateRecordModal = ({
                 Cancel
               </Button>
               <Button
-                color="primary"
+                color="success"
                 isLoading={navigation.state === "submitting"}
                 type="submit"
                 form="create-record-form"
-                className="font-montserrat font-medium"
+                className="font-montserrat font-medium text-white"
               >
                 {actionText}
               </Button>

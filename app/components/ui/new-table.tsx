@@ -10,10 +10,10 @@ import {
 } from "@nextui-org/react";
 
 import noDataIllustration from "~/assets/illustrations/no-data.svg";
+import { useNavigation } from "@remix-run/react";
 
 const CustomTable = ({
   columns,
-  loadingState,
   children,
   page,
   setPage,
@@ -22,7 +22,6 @@ const CustomTable = ({
   customHeightClass,
 }: {
   columns: string[];
-  loadingState: any;
   children: ReactNode | any;
   page: number;
   setPage: (page: number) => void;
@@ -30,6 +29,8 @@ const CustomTable = ({
   hidePagination?: boolean;
   customHeightClass?: string;
 }) => {
+  const navigation = useNavigation();
+
   return (
     <div className="h-full flex flex-col gap-1">
       <Table
@@ -56,8 +57,8 @@ const CustomTable = ({
         </TableHeader>
 
         <TableBody
-          loadingState={loadingState}
-          loadingContent={<Spinner />}
+          loadingState={navigation.state === "loading" ? "loading" : "idle"}
+          loadingContent={<Spinner color="success" size="lg" />}
           emptyContent={
             <div className="md:!h-[63vh] h-[60vh] flex flex-col gap-8 items-center justify-center">
               <img src={noDataIllustration} alt="No data" className="w-1/3" />
