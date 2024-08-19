@@ -1,6 +1,8 @@
 import { Button, TableCell, TableRow } from "@nextui-org/react";
 import { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { useLoaderData, useNavigate } from "@remix-run/react";
+import { useState } from "react";
+import { ImageInputWithPreview } from "~/components/inputs/image";
 import TextInput from "~/components/inputs/text-input";
 import TextareaInput from "~/components/inputs/textarea";
 import SearchAndCreateRecordBar from "~/components/sections/search-create-bar";
@@ -11,6 +13,9 @@ import DepartmentController from "~/controllers/DepartmentController";
 export default function AdminEmployeesManagement() {
   const { search_term, page, employees } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
+
+  // state to handle base64 image
+  const [imageString, setImageString] = useState("");
 
   return (
     <div>
@@ -24,18 +29,35 @@ export default function AdminEmployeesManagement() {
         formIntent="create-employee"
       >
         <div className="flex flex-col gap-5">
-          <TextInput label="Name" name="name" />
-          <TextareaInput label="Description" name="description" />
+          <TextInput label="First Name" name="firstName" isRequired />
+          <TextInput label="Last Name" name="lastName" isRequired />
+          <TextInput label="Email" name="email" type="email" isRequired />
+          <TextInput label="Phone" name="phone" type="tel" isRequired />
+          <TextInput
+            label="Base Salary"
+            name="baseSalary"
+            type="number"
+            isRequired
+          />
+          <ImageInputWithPreview
+            name="image"
+            imageString={imageString}
+            setImageString={setImageString}
+            label="Passport Picture"
+          />
         </div>
       </SearchAndCreateRecordBar>
 
-      <CustomTable
-        columns={["Name", "Description", "Actions"]}
-        page={page}
-        setPage={(page) => navigate(`?page=${page}&search_term=${search_term}`)}
-        totalPages={1}
-      >
-        {employees?.map(
+      <div className="px-4">
+        <CustomTable
+          columns={["Name", "Description", "Actions"]}
+          page={page}
+          setPage={(page) =>
+            navigate(`?page=${page}&search_term=${search_term}`)
+          }
+          totalPages={1}
+        >
+          {/* {employees?.map(
           (employee: { name: string; description: string }, index: number) => (
             <TableRow key={index}>
               <TableCell>{employee.name}</TableCell>
@@ -46,8 +68,9 @@ export default function AdminEmployeesManagement() {
               </TableCell>
             </TableRow>
           )
-        )}
-      </CustomTable>
+        )} */}
+        </CustomTable>
+      </div>
     </div>
   );
 }
@@ -56,7 +79,7 @@ export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
   const formValues = Object.fromEntries(formData.entries());
 
-  if (formValues.intent === "create-department") {
+  if (formValues.intent === "create-employee") {
     console.log(formValues);
     return formValues;
   }
@@ -70,10 +93,11 @@ export const loader: LoaderFunction = async ({ request }) => {
   const page = parseInt(url.searchParams.get("page") || "1");
 
   const departmentController = await new DepartmentController(request);
-  const employees = departmentController.getDepartments({
-    page,
-    search_term,
-  });
+  const employees =
+    departmentController.getDepartments({
+      page,
+      search_term,
+    }) || [];
 
   return {
     search_term,

@@ -40,8 +40,8 @@ const CustomTable = ({
             customHeightClass ? customHeightClass : "md:!h-[78vh]"
           } h-[65vh] overflow-y-auto w-screen md:w-full overflow-x-auto  shadow-none`,
           wrapper:
-            "dark:bg-slate-900 vertical-scrollbar horizontal-scrollbar shadow-none bg-white rounded-2xl dark:border border-white/5",
-          th: "dark:bg-slate-800",
+            "vertical-scrollbar horizontal-scrollbar shadow-none rounded-2xl dark:border border-white/5",
+          th: "",
           td: "font-nunito text-xs text-slate-500 dark:text-slate-200 ",
         }}
       >
