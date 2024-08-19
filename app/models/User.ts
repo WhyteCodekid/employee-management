@@ -70,6 +70,9 @@ const userSchema = new Schema<UserInterface>(
       enum: ["active", "inactive"],
       default: "active",
     },
+    image: {
+      type: String,
+    },
   },
   {
     timestamps: true,
