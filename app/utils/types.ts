@@ -1,5 +1,3 @@
-import type { Document } from "mongodb";
-
 export type UserInterface = {
   _id: string;
   firstName: string;
@@ -31,6 +29,13 @@ export type SettingsInterface = {
   email: string;
   separateStocks: boolean;
   allowInscription: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type AttendanceInterface = {
+  _id: string;
+  user: UserInterface;
   createdAt: Date;
   updatedAt: Date;
 };

@@ -58,8 +58,10 @@ export default function AdminDepartmentsManagement() {
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
   const formValues = Object.fromEntries(formData.entries());
+  const departmentController = await new DepartmentController(request);
 
   if (formValues.intent === "create-department") {
+    return await departmentController.createDepartment(formValues);
     console.log(formValues);
     return formValues;
   }
@@ -73,7 +75,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   const page = parseInt(url.searchParams.get("page") || "1");
 
   const departmentController = await new DepartmentController(request);
-  const departments = departmentController.getDepartments({
+  const { departments, totalPages } = departmentController.getDepartments({
     page,
     search_term,
   });
@@ -82,5 +84,6 @@ export const loader: LoaderFunction = async ({ request }) => {
     search_term,
     page,
     departments,
+    totalPages,
   };
 };

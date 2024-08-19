@@ -3,7 +3,7 @@ import type { DepartmentInterface } from "../utils/types";
 import { commitFlashSession, getFlashSession } from "~/utils/flash-session";
 import Department from "~/models/Department";
 
-export default class DepartmentController {
+export default class AttendanceController {
   private request: Request;
   private path: string;
 
