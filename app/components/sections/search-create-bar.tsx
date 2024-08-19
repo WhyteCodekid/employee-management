@@ -1,6 +1,6 @@
 import { Button, Input, useDisclosure } from "@nextui-org/react";
 import CreateRecordModal from "../modals/CreateRecord";
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { useNavigate } from "@remix-run/react";
 
 export default function SearchAndCreateRecordBar({
@@ -10,6 +10,7 @@ export default function SearchAndCreateRecordBar({
   formIntent = "create",
   searchValue,
   pageValue,
+  actionData,
 }: {
   buttonText?: string;
   children: ReactNode;
@@ -17,9 +18,16 @@ export default function SearchAndCreateRecordBar({
   formIntent?: string;
   searchValue?: string;
   pageValue?: string;
+  actionData: any;
 }) {
   const createRecordDisclosure = useDisclosure();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (actionData) {
+      createRecordDisclosure.onClose();
+    }
+  }, [actionData]);
 
   return (
     <div className="flex items-center justify-between py-4 px-4">
