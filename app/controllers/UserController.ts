@@ -337,6 +337,7 @@ export default class UserController {
     dateOfBirth,
     permissions,
     position,
+    image,
   }: {
     firstName: string;
     lastName: string;
@@ -347,6 +348,7 @@ export default class UserController {
     dateOfBirth: string;
     permissions: string[];
     position: string;
+    image: string;
   }) => {
     const session = await getFlashSession(this.request.headers.get("Cookie"));
 
@@ -393,6 +395,7 @@ export default class UserController {
         dateOfBirth,
         permissions,
         position,
+        image,
       });
 
       session.flash("message", {
@@ -404,13 +407,6 @@ export default class UserController {
           "Set-Cookie": await commitFlashSession(session),
         },
       });
-
-      return {
-        status: "success",
-        code: 200,
-        message: "User created successfully",
-        data: user,
-      };
     } catch (error) {
       console.log(error);
       session.flash("message", {
@@ -422,17 +418,6 @@ export default class UserController {
           "Set-Cookie": await commitFlashSession(session),
         },
       });
-      return {
-        status: "error",
-        code: 400,
-        message: "Error Creating User",
-        errors: [
-          {
-            field: "error",
-            message: error.message,
-          },
-        ],
-      };
     }
   };
 
