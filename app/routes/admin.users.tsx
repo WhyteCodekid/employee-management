@@ -1,18 +1,25 @@
-import { Button, TableCell, TableRow } from "@nextui-org/react";
+import { Button, SelectItem, TableCell, TableRow } from "@nextui-org/react";
 import { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { useLoaderData, useNavigate } from "@remix-run/react";
 import { useState } from "react";
 import { ImageInputWithPreview } from "~/components/inputs/image";
+import CustomSelect from "~/components/inputs/select";
 import TextInput from "~/components/inputs/text-input";
-import TextareaInput from "~/components/inputs/textarea";
 import SearchAndCreateRecordBar from "~/components/sections/search-create-bar";
 import Header from "~/components/ui/header";
 import CustomTable from "~/components/ui/new-table";
 import DepartmentController from "~/controllers/DepartmentController";
 import UserController from "~/controllers/UserController";
+import { UserInterface } from "~/utils/types";
 
 export default function AdminEmployeesManagement() {
-  const { search_term, page, employees } = useLoaderData<typeof loader>();
+  const { search_term, page, employees } = useLoaderData<{
+    search_term: string;
+    page: number;
+    employees: UserInterface[];
+  }>();
+  console.log(employees);
+
   const navigate = useNavigate();
 
   // state to handle base64 image
@@ -34,6 +41,14 @@ export default function AdminEmployeesManagement() {
           <TextInput label="Last Name" name="lastName" isRequired />
           <TextInput label="Email" name="email" type="email" isRequired />
           <TextInput label="Phone" name="phone" type="tel" isRequired />
+          <CustomSelect name="role" label="Employee Role">
+            <SelectItem className="font-quicksand" key={"admin"}>
+              Administrator
+            </SelectItem>
+            <SelectItem className="font-quicksand" key={"staff"}>
+              Staff
+            </SelectItem>
+          </CustomSelect>
           <TextInput
             label="Base Salary"
             name="baseSalary"
@@ -58,18 +73,13 @@ export default function AdminEmployeesManagement() {
           }
           totalPages={1}
         >
-          {/* {employees?.map(
-          (employee: { name: string; description: string }, index: number) => (
+          {/* {employees?.map((employee: UserInterface, index: number) => (
             <TableRow key={index}>
-              <TableCell>{employee.name}</TableCell>
-              <TableCell>{employee.description}</TableCell>
-              <TableCell className="flex items-center gap-3">
-                <Button>Edit</Button>
-                <Button>Delete</Button>
-              </TableCell>
+              <TableCell>{employee.firstName}</TableCell>
+              <TableCell>{employee.firstName}</TableCell>
+              <TableCell>{employee.firstName}</TableCell>
             </TableRow>
-          )
-        )} */}
+          ))} */}
         </CustomTable>
       </div>
     </div>
@@ -80,11 +90,11 @@ export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
   const formValues = Object.fromEntries(formData.entries());
 
-  const userController = await new UserController(request);
+  const userController = new UserController(request);
   if (formValues.intent === "create-employee") {
-    await userController.createUser(formValues);
-    console.log(formValues);
-    return formValues;
+    const response = await userController.createUser(formValues);
+    console.log(response);
+    return response;
   }
 
   return null;
@@ -95,12 +105,11 @@ export const loader: LoaderFunction = async ({ request }) => {
   const search_term = url.searchParams.get("search_term") || "";
   const page = parseInt(url.searchParams.get("page") || "1");
 
-  const departmentController = await new DepartmentController(request);
-  const employees =
-    departmentController.getDepartments({
-      page,
-      search_term,
-    }) || [];
+  const userController = new UserController(request);
+  const employees = userController.getUsers({
+    page,
+    search_term,
+  });
 
   return {
     search_term,
