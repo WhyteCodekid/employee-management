@@ -5,12 +5,11 @@ import {
   type SessionStorage,
 } from "@remix-run/node";
 import bcrypt from "bcryptjs";
+import Admin from "~/models/Admin";
 import { commitFlashSession, getFlashSession } from "~/utils/flash-session";
 
 export default class AdminController {
   private request: Request;
-  private session: any;
-  private Admin: any;
   private storage: SessionStorage;
 
   /**
@@ -72,7 +71,7 @@ export default class AdminController {
     }
 
     try {
-      const admin = await this.Admin.findById(adminId).select("-password");
+      const admin = await Admin.findById(adminId).select("-password");
       return admin;
     } catch {
       throw this.logout();
@@ -87,7 +86,7 @@ export default class AdminController {
     password: string;
   }) {
     const session = await getFlashSession(this.request.headers.get("Cookie"));
-    const admin = await this.Admin.findOne({ email });
+    const admin = await Admin.findOne({ email });
 
     if (!admin) {
       session.flash("message", {
@@ -120,7 +119,6 @@ export default class AdminController {
 
   public async logout() {
     const session = await this.getAdminSession();
-
     return redirect("/console/login", {
       headers: {
         "Set-Cookie": await this.storage.destroySession(session),
@@ -186,11 +184,11 @@ export default class AdminController {
           }
         : {};
 
-      const admins = await this.Admin.find(searchFilter)
+      const admins = await Admin.find(searchFilter)
         .skip(skipCount)
         .limit(limit)
         .exec();
-      const totalAdminCount = await this.Admin.countDocuments({}).exec();
+      const totalAdminCount = await Admin.countDocuments({}).exec();
       const totalPages = Math.ceil(totalAdminCount / limit);
 
       return { admins, totalPages };
@@ -225,7 +223,7 @@ export default class AdminController {
   }) => {
     const session = await getFlashSession(this.request.headers.get("Cookie"));
 
-    const existingAdmin = await this.Admin.findOne({ username });
+    const existingAdmin = await Admin.findOne({ username });
 
     if (existingAdmin) {
       session.flash("message", {
@@ -240,7 +238,7 @@ export default class AdminController {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const admin = await this.Admin.create({
+    const admin = await Admin.create({
       firstName,
       lastName,
       email,
@@ -279,7 +277,7 @@ export default class AdminController {
    * @returns
    */
   public getAdmin = async (id: string) => {
-    const admin = await this.Admin.findById(id);
+    const admin = await Admin.findById(id);
     return admin;
   };
 
@@ -307,7 +305,7 @@ export default class AdminController {
     _id: string;
   }) => {
     // try {
-    await this.Admin.findOneAndUpdate(
+    await Admin.findOneAndUpdate(
       { _id },
       {
         firstName,
@@ -343,7 +341,7 @@ export default class AdminController {
   };
 
   public deleteAdmin = async (id: string) => {
-    await this.Admin.findByIdAndDelete(id);
+    await Admin.findByIdAndDelete(id);
     return json({ message: "Admin deleted successfully" }, { status: 200 });
   };
 }

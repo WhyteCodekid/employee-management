@@ -1,6 +1,6 @@
 import { redirect } from "@remix-run/node";
 import type { DepartmentInterface } from "../utils/types";
-import { commitFlashSession, getFlashSession } from "~/flash-session";
+import { commitFlashSession, getFlashSession } from "~/utils/flash-session";
 import Department from "~/models/Department";
 
 export default class DepartmentController {
@@ -86,7 +86,7 @@ export default class DepartmentController {
       return { departments, totalPages };
     } catch (error) {
       console.log(error);
-      session.flash("alert", {
+      session.flash("message", {
         title: "Error!",
         status: "error",
         message: "Error retrieving departments",

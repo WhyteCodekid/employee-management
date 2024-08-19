@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import mongoose from "~/mongoose";
+import mongoose from "~/utils/mongoose";
 import { DepartmentInterface } from "~/utils/types";
 
 const schema = new Schema<DepartmentInterface>(
