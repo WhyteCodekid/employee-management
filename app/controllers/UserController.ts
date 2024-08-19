@@ -163,101 +163,6 @@ export default class UserController {
     }
   }
 
-  /**
-   * Login user with phone number
-   * @param phone
-   * @returns redirect
-   * @throws Error
-   **/
-  // public async loginUserWithPhone({ phone }: { phone: string }) {
-  //   const session = await getFlashSession(this.request.headers.get("Cookie"));
-
-  //   try {
-  //     const user = await User.findOne({
-  //       phone,
-  //     });
-
-  //     if (!user) {
-  //       return json({
-  //         status: "error",
-  //         message: "Bad Request. The provided input is invalid.",
-  //         errors: [
-  //           {
-  //             field: "phone",
-  //             message: "Phonne number does not exist.",
-  //           },
-  //         ],
-  //       });
-  //     }
-
-  //     const otp = await generateOTP();
-
-  //     await User.findOneAndUpdate(
-  //       { phone },
-  //       {
-  //         otp: otp,
-  //       },
-  //       {
-  //         new: true,
-  //       }
-  //     );
-
-  //     // send otp here
-  //     const smsRess = await sendSMS({
-  //       smsText: `Your verification code is ${otp} - Adamus IT`,
-  //       recipient: phone,
-  //     });
-
-  //     session.flash("alert", {
-  //       title: "Success!",
-  //       message:
-  //         "Sending OTP to your phone number. This may take a few seconds.",
-  //       status: "success",
-  //     });
-  //     return redirect(`/login/verify-otp`, {
-  //       headers: {
-  //         "Set-Cookie": await commitFlashSession(session),
-  //       },
-  //     });
-  //   } catch (error) {
-  //     return {
-  //       status: "error",
-  //       message: "Bad Request. The provided input is invalid.",
-  //       errors: [
-  //         {
-  //           field: "phone",
-  //           message: "Phone number does not exist.",
-  //         },
-  //       ],
-  //     };
-  //   }
-  // }
-
-  // public async verifyOTP({ otp }: { otp: string }) {
-  //   const session = await getFlashSession(this.request.headers.get("Cookie"));
-
-  //   const user = await User.findOne({
-  //     otp,
-  //   });
-
-  //   if (!user) {
-  //     return {
-  //       status: "error",
-  //       message: "",
-  //       errors: [
-  //         {
-  //           field: "otp",
-  //           message: "OTP is invalid.",
-  //         },
-  //       ],
-  //     };
-  //   }
-
-  //   // clear otp
-  //   await User.findOneAndUpdate({ otp }, { otp: "" }, { new: true });
-  //   return await this.createUserSession(user.id, `/${user.role}`);
-  // }
-
   public async loginUser({
     email,
     password,
@@ -429,7 +334,6 @@ export default class UserController {
     role,
     department,
     phone,
-    staffId,
     dateOfBirth,
     permissions,
     position,
@@ -440,7 +344,6 @@ export default class UserController {
     role: string;
     department: string;
     phone: string;
-    staffId: string;
     dateOfBirth: string;
     permissions: string[];
     position: string;
@@ -449,7 +352,6 @@ export default class UserController {
 
     try {
       const phoneExist = await User.findOne({ phone });
-      const staffIdExist = await User.findOne({ staffId });
       const emailExist = await User.findOne({ email });
 
       const errors = [];
@@ -458,13 +360,6 @@ export default class UserController {
         errors.push({
           field: "phone",
           message: "Phone number already in use",
-        });
-      }
-
-      if (staffIdExist) {
-        errors.push({
-          field: "staffId",
-          message: "Staff ID already in use",
         });
       }
 
@@ -494,7 +389,7 @@ export default class UserController {
         role,
         department,
         phone,
-        staffId,
+        staffId: await this.generateStaffId(),
         dateOfBirth,
         permissions,
         position,
@@ -832,5 +727,10 @@ export default class UserController {
         },
       });
     }
+  };
+
+  private generateStaffId = async () => {
+    const staffId = Math.floor(100000 + Math.random() * 900000);
+    return staffId.toString();
   };
 }
