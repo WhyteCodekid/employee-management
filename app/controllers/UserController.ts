@@ -6,9 +6,9 @@ import {
 } from "@remix-run/node";
 import bcrypt from "bcryptjs";
 import User from "~/models/User";
-import { commitFlashSession, getFlashSession } from "~/flash-session";
-import generateOTP from "~/utils/generateOTP";
-import sendSMS from "~/utils/sendSMS";
+import { commitFlashSession, getFlashSession } from "~/utils/flash-session";
+// import generateOTP from "~/utils/generateOTP";
+// import sendSMS from "~/utils/sendSMS";
 
 export default class UserController {
   private request: Request;
@@ -86,10 +86,10 @@ export default class UserController {
     // const userId = session.get("userId");
 
     if (!userId) {
-      session.flash("alert", {
+      session.flash("message", {
         title: "Unauthorized",
         status: "error",
-        message: "You need to login to access this page",
+        description: "You need to login to access this page",
       });
       throw redirect(`/login`, {
         headers: {
@@ -127,10 +127,10 @@ export default class UserController {
     const user = await User.findById(userId).select("-password");
 
     if (user?.role !== requiredRole) {
-      session.flash("alert", {
+      session.flash("message", {
         title: "Access Denied!",
         status: "error",
-        message: "You do not have access to this page",
+        description: "You do not have access to this page",
       });
       throw redirect(`/${user?.role}`, {
         headers: {
@@ -169,103 +169,94 @@ export default class UserController {
    * @returns redirect
    * @throws Error
    **/
-  public async loginUserWithPhone({ phone }: { phone: string }) {
-    const session = await getFlashSession(this.request.headers.get("Cookie"));
+  // public async loginUserWithPhone({ phone }: { phone: string }) {
+  //   const session = await getFlashSession(this.request.headers.get("Cookie"));
 
-    try {
-      const user = await User.findOne({
-        phone,
-      });
+  //   try {
+  //     const user = await User.findOne({
+  //       phone,
+  //     });
 
-      if (!user) {
-        return json({
-          status: "error",
-          message: "Bad Request. The provided input is invalid.",
-          errors: [
-            {
-              field: "phone",
-              message: "Phonne number does not exist.",
-            },
-          ],
-        });
-      }
+  //     if (!user) {
+  //       return json({
+  //         status: "error",
+  //         message: "Bad Request. The provided input is invalid.",
+  //         errors: [
+  //           {
+  //             field: "phone",
+  //             message: "Phonne number does not exist.",
+  //           },
+  //         ],
+  //       });
+  //     }
 
-      const otp = await generateOTP();
+  //     const otp = await generateOTP();
 
-      await User.findOneAndUpdate(
-        { phone },
-        {
-          otp: otp,
-        },
-        {
-          new: true,
-        }
-      );
+  //     await User.findOneAndUpdate(
+  //       { phone },
+  //       {
+  //         otp: otp,
+  //       },
+  //       {
+  //         new: true,
+  //       }
+  //     );
 
-      // send otp here
-      const smsRess = await sendSMS({
-        smsText: `Your verification code is ${otp} - Adamus IT`,
-        recipient: phone,
-      });
+  //     // send otp here
+  //     const smsRess = await sendSMS({
+  //       smsText: `Your verification code is ${otp} - Adamus IT`,
+  //       recipient: phone,
+  //     });
 
-      session.flash("alert", {
-        title: "Success!",
-        message:
-          "Sending OTP to your phone number. This may take a few seconds.",
-        status: "success",
-      });
-      return redirect(`/login/verify-otp`, {
-        headers: {
-          "Set-Cookie": await commitFlashSession(session),
-        },
-      });
-    } catch (error) {
-      return {
-        status: "error",
-        message: "Bad Request. The provided input is invalid.",
-        errors: [
-          {
-            field: "phone",
-            message: "Phone number does not exist.",
-          },
-        ],
-      };
-    }
-  }
+  //     session.flash("alert", {
+  //       title: "Success!",
+  //       message:
+  //         "Sending OTP to your phone number. This may take a few seconds.",
+  //       status: "success",
+  //     });
+  //     return redirect(`/login/verify-otp`, {
+  //       headers: {
+  //         "Set-Cookie": await commitFlashSession(session),
+  //       },
+  //     });
+  //   } catch (error) {
+  //     return {
+  //       status: "error",
+  //       message: "Bad Request. The provided input is invalid.",
+  //       errors: [
+  //         {
+  //           field: "phone",
+  //           message: "Phone number does not exist.",
+  //         },
+  //       ],
+  //     };
+  //   }
+  // }
 
-  public async verifyOTP({ otp }: { otp: string }) {
-    const session = await getFlashSession(this.request.headers.get("Cookie"));
+  // public async verifyOTP({ otp }: { otp: string }) {
+  //   const session = await getFlashSession(this.request.headers.get("Cookie"));
 
-    const user = await User.findOne({
-      otp,
-    });
+  //   const user = await User.findOne({
+  //     otp,
+  //   });
 
-    if (!user) {
-      return {
-        status: "error",
-        message: "",
-        errors: [
-          {
-            field: "otp",
-            message: "OTP is invalid.",
-          },
-        ],
-      };
-    }
+  //   if (!user) {
+  //     return {
+  //       status: "error",
+  //       message: "",
+  //       errors: [
+  //         {
+  //           field: "otp",
+  //           message: "OTP is invalid.",
+  //         },
+  //       ],
+  //     };
+  //   }
 
-    // clear otp
-    await User.findOneAndUpdate(
-      { otp },
-      {
-        otp: "",
-      },
-      {
-        new: true,
-      }
-    );
-
-    return await this.createUserSession(user.id, `/${user.role}`);
-  }
+  //   // clear otp
+  //   await User.findOneAndUpdate({ otp }, { otp: "" }, { new: true });
+  //   return await this.createUserSession(user.id, `/${user.role}`);
+  // }
 
   public async loginUser({
     email,
@@ -276,14 +267,12 @@ export default class UserController {
   }) {
     const session = await getFlashSession(this.request.headers.get("Cookie"));
 
-    const user = await User.findOne({
-      email,
-    });
+    const user = await User.findOne({ email });
 
     if (!user) {
-      session.flash("alert", {
+      session.flash("message", {
         title: "Error!",
-        message: "No Account with email!",
+        description: "No Account with email!",
         status: "error",
       });
       return redirect(`/login`, {
@@ -544,65 +533,22 @@ export default class UserController {
     limit?: number;
   }) => {
     const skipCount = (page - 1) * limit; // Calculate the number of documents to skip
+    const regex = new RegExp(
+      search_term
+        .split(" ")
+        .map((term) => `(?=.*${term})`)
+        .join(""),
+      "i"
+    );
 
     const searchFilter = search_term
       ? {
           $or: [
-            {
-              firstName: {
-                $regex: new RegExp(
-                  search_term
-                    .split(" ")
-                    .map((term) => `(?=.*${term})`)
-                    .join(""),
-                  "i"
-                ),
-              },
-            },
-            {
-              lastName: {
-                $regex: new RegExp(
-                  search_term
-                    .split(" ")
-                    .map((term) => `(?=.*${term})`)
-                    .join(""),
-                  "i"
-                ),
-              },
-            },
-            {
-              email: {
-                $regex: new RegExp(
-                  search_term
-                    .split(" ")
-                    .map((term) => `(?=.*${term})`)
-                    .join(""),
-                  "i"
-                ),
-              },
-            },
-            {
-              phone: {
-                $regex: new RegExp(
-                  search_term
-                    .split(" ")
-                    .map((term) => `(?=.*${term})`)
-                    .join(""),
-                  "i"
-                ),
-              },
-            },
-            {
-              staffId: {
-                $regex: new RegExp(
-                  search_term
-                    .split(" ")
-                    .map((term) => `(?=.*${term})`)
-                    .join(""),
-                  "i"
-                ),
-              },
-            },
+            { firstName: regex },
+            { lastName: regex },
+            { email: regex },
+            { phone: regex },
+            { staffId: regex },
           ],
         }
       : {};
@@ -652,6 +598,14 @@ export default class UserController {
       if (role) baseFilter.role = role;
     }
 
+    const regex = new RegExp(
+      search_term
+        .split(" ")
+        .map((term) => `(?=.*${term})`)
+        .join(""),
+      "i"
+    );
+
     // Construct the search filter
     const searchFilter = search_term
       ? {
@@ -659,61 +613,11 @@ export default class UserController {
             baseFilter,
             {
               $or: [
-                {
-                  firstName: {
-                    $regex: new RegExp(
-                      search_term
-                        .split(" ")
-                        .map((term) => `(?=.*${term})`)
-                        .join(""),
-                      "i"
-                    ),
-                  },
-                },
-                {
-                  lastName: {
-                    $regex: new RegExp(
-                      search_term
-                        .split(" ")
-                        .map((term) => `(?=.*${term})`)
-                        .join(""),
-                      "i"
-                    ),
-                  },
-                },
-                {
-                  email: {
-                    $regex: new RegExp(
-                      search_term
-                        .split(" ")
-                        .map((term) => `(?=.*${term})`)
-                        .join(""),
-                      "i"
-                    ),
-                  },
-                },
-                {
-                  phone: {
-                    $regex: new RegExp(
-                      search_term
-                        .split(" ")
-                        .map((term) => `(?=.*${term})`)
-                        .join(""),
-                      "i"
-                    ),
-                  },
-                },
-                {
-                  staffId: {
-                    $regex: new RegExp(
-                      search_term
-                        .split(" ")
-                        .map((term) => `(?=.*${term})`)
-                        .join(""),
-                      "i"
-                    ),
-                  },
-                },
+                { firstName: regex },
+                { lastName: regex },
+                { email: regex },
+                { phone: regex },
+                { staffId: regex },
               ],
             },
           ],
@@ -745,37 +649,25 @@ export default class UserController {
 
     try {
       await User.findByIdAndDelete(userId);
-      // session.flash("message", {
-      //   title: "User Deleted",
-      //   status: "success",
-      // });
-      // return redirect(path, {
-      //   headers: {
-      //     "Set-Cookie": await commitFlashSession(session),
-      //   },
-      // });
-      return {
+      session.flash("message", {
+        title: "User Deleted",
         status: "success",
-        code: 200,
-        message: "User account deleted successfully",
-      };
+      });
+      return redirect(path, {
+        headers: {
+          "Set-Cookie": await commitFlashSession(session),
+        },
+      });
     } catch (error) {
-      // session.flash("message", {
-      //   title: "Error Deleting User!",
-      //   status: "error",
-      // });
-      // return redirect(path, {
-      //   headers: {
-      //     "Set-Cookie": await commitFlashSession(session),
-      //   },
-      // });
-
-      return {
+      session.flash("message", {
+        title: "Error Deleting User!",
         status: "error",
-        code: 400,
-        message: "Error Deleting User",
-        errors: [],
-      };
+      });
+      return redirect(path, {
+        headers: {
+          "Set-Cookie": await commitFlashSession(session),
+        },
+      });
     }
   };
 
@@ -939,44 +831,6 @@ export default class UserController {
           "Set-Cookie": await commitFlashSession(session),
         },
       });
-    }
-  };
-
-  public removeDuplicates = async () => {
-    try {
-      // Step 1: Find duplicate records
-      const duplicates = await User.aggregate([
-        {
-          $group: {
-            _id: {
-              firstName: "$firstName",
-              lastName: "$lastName",
-              rowDepartment: "$rowDepartment",
-            },
-            uniqueIds: { $addToSet: "$_id" },
-            count: { $sum: 1 },
-          },
-        },
-        {
-          $match: {
-            count: { $gt: 1 },
-          },
-        },
-      ]);
-
-      // Step 2: Delete duplicates
-      for (const duplicate of duplicates) {
-        // Keep the first record and remove the rest
-        const [firstId, ...otherIds] = duplicate.uniqueIds;
-        await User.deleteMany({ _id: { $in: otherIds } });
-      }
-
-      console.log("Duplicate records removed successfully.");
-    } catch (error) {
-      console.error("Error removing duplicates:", error);
-    } finally {
-      // Close the connection
-      console.log("operation done...");
     }
   };
 }
