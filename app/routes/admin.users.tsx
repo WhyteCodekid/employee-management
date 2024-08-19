@@ -9,6 +9,7 @@ import SearchAndCreateRecordBar from "~/components/sections/search-create-bar";
 import Header from "~/components/ui/header";
 import CustomTable from "~/components/ui/new-table";
 import DepartmentController from "~/controllers/DepartmentController";
+import UserController from "~/controllers/UserController";
 
 export default function AdminEmployeesManagement() {
   const { search_term, page, employees } = useLoaderData<typeof loader>();
@@ -79,7 +80,9 @@ export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
   const formValues = Object.fromEntries(formData.entries());
 
+  const userController = await new UserController(request);
   if (formValues.intent === "create-employee") {
+    await userController.createUser(formValues);
     console.log(formValues);
     return formValues;
   }

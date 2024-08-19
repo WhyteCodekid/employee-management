@@ -1,16 +1,6 @@
 import type { Document } from "mongodb";
 
-export type AdminInterface = {
-  _id: string;
-  username: string;
-  email: string;
-  role?: string;
-  permissions?: [{ name: string; action: string }];
-  createdAt: Date;
-  updatedAt: Date;
-};
-
-export type EmployeeInterface = {
+export type UserInterface = {
   _id: string;
   firstName: string;
   middleName: string;

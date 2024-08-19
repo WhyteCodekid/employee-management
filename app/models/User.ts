@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import mongoose from "~/mongoose";
+import mongoose from "~/utils/mongoose";
 import { UserInterface } from "~/utils/types";
 const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 const phoneRegex = /^[0-9]{11}$/; // Example regex for phone numbers (adjust as needed)
