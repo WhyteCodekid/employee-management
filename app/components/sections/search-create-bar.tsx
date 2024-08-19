@@ -17,7 +17,7 @@ export default function SearchAndCreateRecordBar({
   modalTitle?: string;
   formIntent?: string;
   searchValue?: string;
-  pageValue?: string;
+  pageValue?: number;
   actionData: any;
 }) {
   const createRecordDisclosure = useDisclosure();

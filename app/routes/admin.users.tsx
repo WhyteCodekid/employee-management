@@ -13,11 +13,7 @@ import UserController from "~/controllers/UserController";
 import { UserInterface } from "~/utils/types";
 
 export default function AdminEmployeesManagement() {
-  const { search_term, page, employees } = useLoaderData<{
-    search_term: string;
-    page: number;
-    employees: UserInterface[];
-  }>();
+  const { search_term, page, employees } = useLoaderData<typeof loader>();
   console.log(employees);
 
   const navigate = useNavigate();
@@ -71,15 +67,15 @@ export default function AdminEmployeesManagement() {
           setPage={(page) =>
             navigate(`?page=${page}&search_term=${search_term}`)
           }
-          totalPages={1}
+          totalPages={employees?.totalPages}
         >
-          {/* {employees?.map((employee: UserInterface, index: number) => (
+          {employees?.users?.map((employee: UserInterface, index: number) => (
             <TableRow key={index}>
               <TableCell>{employee.firstName}</TableCell>
               <TableCell>{employee.firstName}</TableCell>
               <TableCell>{employee.firstName}</TableCell>
             </TableRow>
-          ))} */}
+          ))}
         </CustomTable>
       </div>
     </div>
@@ -92,7 +88,7 @@ export const action: ActionFunction = async ({ request }) => {
 
   const userController = new UserController(request);
   if (formValues.intent === "create-employee") {
-    const response = await userController.createUser(formValues);
+    await userController.createUser(formValues);
     console.log(response);
     return response;
   }
@@ -106,7 +102,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   const page = parseInt(url.searchParams.get("page") || "1");
 
   const userController = new UserController(request);
-  const employees = userController.getUsers({
+  const employees = await userController.getUsers({
     page,
     search_term,
   });
