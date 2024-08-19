@@ -1,8 +1,20 @@
 import React, { useEffect, useRef } from "react";
 import * as faceapi from "face-api.js";
 import knownFaces from "~/assets/faces.json";
+import { TableRow, TableCell, Button } from "@nextui-org/react";
+import { useLoaderData, useNavigate } from "@remix-run/react";
+import TextInput from "~/components/inputs/text-input";
+import TextareaInput from "~/components/inputs/textarea";
+import SearchAndCreateRecordBar from "~/components/sections/search-create-bar";
+import Header from "~/components/ui/header";
+import CustomTable from "~/components/ui/new-table";
+import { LoaderFunction } from "@remix-run/node";
+import DepartmentController from "~/controllers/DepartmentController";
 
 const App = () => {
+  const { search_term, page, departments } = useLoaderData<typeof loader>();
+  const navigate = useNavigate();
+
   const videoRef = useRef();
   const canvasRef = useRef();
 
@@ -88,11 +100,67 @@ const App = () => {
   }, []);
 
   return (
-    <div className="App">
-      <video ref={videoRef} autoPlay muted width="720" height="560" />
-      <canvas ref={canvasRef} style={{ position: "absolute" }} />
+    <div className="">
+      <Header title="Manage Departments" />
+      <video ref={videoRef} autoPlay muted width="120" height="560" />
+      {/* <canvas ref={canvasRef} style={{ position: "absolute" }} /> */}
+
+      <SearchAndCreateRecordBar
+        buttonText="New Department"
+        modalTitle="Create New Department"
+        searchValue={search_term}
+        pageValue={page}
+        formIntent="create-department"
+      >
+        <div className="flex flex-col gap-5">
+          <TextInput label="Name" name="name" />
+          <TextareaInput label="Description" name="description" />
+        </div>
+      </SearchAndCreateRecordBar>
+
+      <CustomTable
+        columns={["Name", "Description", "Actions"]}
+        page={page}
+        setPage={(page) => navigate(`?page=${page}&search_term=${search_term}`)}
+        totalPages={1}
+      >
+        {departments?.map(
+          (
+            department: { name: string; description: string },
+            index: number
+          ) => (
+            <TableRow key={index}>
+              <TableCell>{department.name}</TableCell>
+              <TableCell>{department.description}</TableCell>
+              <TableCell className="flex items-center gap-3">
+                <Button>Edit</Button>
+                <Button>Delete</Button>
+              </TableCell>
+            </TableRow>
+          )
+        )}
+      </CustomTable>
     </div>
   );
 };
 
 export default App;
+
+export const loader: LoaderFunction = async ({ request }) => {
+  const url = new URL(request.url);
+  const search_term = url.searchParams.get("search_term") || "";
+  const page = parseInt(url.searchParams.get("page") || "1");
+
+  const departmentController = await new DepartmentController(request);
+  const { departments, totalPages } = departmentController.getDepartments({
+    page,
+    search_term,
+  });
+
+  return {
+    search_term,
+    page,
+    departments,
+    totalPages,
+  };
+};

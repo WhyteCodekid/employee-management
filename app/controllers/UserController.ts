@@ -395,6 +395,16 @@ export default class UserController {
         position,
       });
 
+      session.flash("message", {
+        title: "User created successfuly!",
+        status: "success",
+      });
+      return redirect("/admin/users", {
+        headers: {
+          "Set-Cookie": await commitFlashSession(session),
+        },
+      });
+
       return {
         status: "success",
         code: 200,
@@ -403,7 +413,15 @@ export default class UserController {
       };
     } catch (error) {
       console.log(error);
-
+      session.flash("message", {
+        title: "Something went wrong!",
+        status: "error",
+      });
+      return redirect(path, {
+        headers: {
+          "Set-Cookie": await commitFlashSession(session),
+        },
+      });
       return {
         status: "error",
         code: 400,
