@@ -1,6 +1,6 @@
 import type { ActionFunction } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
-import AdminController from "~/controllers/AdminController";
+import AdminController from "~/controllers/UserController";
 
 export const action: ActionFunction = async ({ request }) => {
   const adminAuthControlle = await new AdminController(request);

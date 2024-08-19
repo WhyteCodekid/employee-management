@@ -70,9 +70,6 @@ export default class DepartmentController {
       const departments = await Department.find(searchFilter)
         .skip(skipCount)
         .limit(limit)
-        .populate("parent")
-        .populate("manager")
-        .populate("supervisors")
         .sort({
           createdAt: "desc",
         })

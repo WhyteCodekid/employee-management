@@ -76,57 +76,6 @@ const userSchema = new Schema<UserInterface>(
   }
 );
 
-// // Custom validation function to check uniqueness excluding the current user
-// async function isUnique(value, field, userId) {
-//   const query = { [field]: value };
-//   if (userId) {
-//     query._id = { $ne: userId };
-//   }
-//   const count = await mongoose.models.users.countDocuments(query);
-//   return count === 0;
-// }
-
-// userSchema.pre("save", async function (next) {
-//   const user = this;
-//   const isNew = user.isNew;
-
-//   const checks = [
-//     { field: "email", value: user.email },
-//     { field: "phone", value: user.phone },
-//     { field: "staffId", value: user.staffId },
-//   ];
-
-//   for (const check of checks) {
-//     if (
-//       check.value &&
-//       !(await isUnique(check.value, check.field, isNew ? null : user._id))
-//     ) {
-//       return next(new Error(`${check.field} must be unique`));
-//     }
-//   }
-
-//   next();
-// });
-
-// userSchema.pre("findOneAndUpdate", async function (next) {
-//   const update = this.getUpdate();
-//   const userId = this.getQuery()._id;
-
-//   const checks = [
-//     { field: "email", value: update.email },
-//     { field: "phone", value: update.phone },
-//     { field: "staffId", value: update.staffId },
-//   ];
-
-//   for (const check of checks) {
-//     if (check.value && !(await isUnique(check.value, check.field, userId))) {
-//       return next(new Error(`${check.field} must be unique`));
-//     }
-//   }
-
-//   next();
-// });
-
 let User: mongoose.Model<UserInterface>;
 try {
   User = mongoose.model<UserInterface>("users");
