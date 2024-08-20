@@ -6,7 +6,7 @@ import {
   TableRow,
 } from "@nextui-org/react";
 import { ActionFunction, LoaderFunction } from "@remix-run/node";
-import { useLoaderData, useNavigate } from "@remix-run/react";
+import { useLoaderData, useNavigate, useOutletContext } from "@remix-run/react";
 import { useState } from "react";
 import { ImageInputWithPreview } from "~/components/inputs/image";
 import CustomSelect from "~/components/inputs/select";
@@ -14,13 +14,15 @@ import TextInput from "~/components/inputs/text-input";
 import SearchAndCreateRecordBar from "~/components/sections/search-create-bar";
 import Header from "~/components/ui/header";
 import CustomTable from "~/components/ui/new-table";
-import DepartmentController from "~/controllers/DepartmentController";
 import UserController from "~/controllers/UserController";
 import { UserInterface } from "~/utils/types";
 
 export default function AdminEmployeesManagement() {
+  const flashMessage = useOutletContext<{
+    message: string;
+    status: "error" | "success";
+  }>();
   const { search_term, page, employees } = useLoaderData<typeof loader>();
-  console.log(employees);
 
   const navigate = useNavigate();
 
@@ -37,6 +39,7 @@ export default function AdminEmployeesManagement() {
         searchValue={search_term}
         pageValue={page}
         formIntent="create-employee"
+        flashMessage={flashMessage}
       >
         <div className="flex flex-col gap-5">
           <TextInput label="First Name" name="firstName" isRequired />
@@ -120,8 +123,7 @@ export const action: ActionFunction = async ({ request }) => {
 
   const userController = new UserController(request);
   if (formValues.intent === "create-employee") {
-    await userController.createUser(formValues);
-    return {};
+    return userController.createUser(formValues);
   }
 
   return null;

@@ -62,8 +62,6 @@ export const action: ActionFunction = async ({ request }) => {
 
   if (formValues.intent === "create-department") {
     return await departmentController.createDepartment(formValues);
-    console.log(formValues);
-    return formValues;
   }
 
   return null;
