@@ -73,6 +73,9 @@ const userSchema = new Schema<UserInterface>(
     image: {
       type: String,
     },
+    baseSalary: {
+      type: Number,
+    },
   },
   {
     timestamps: true,

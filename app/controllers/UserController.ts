@@ -338,6 +338,7 @@ export default class UserController {
     permissions,
     position,
     image,
+    baseSalary,
   }: {
     firstName: string;
     lastName: string;
@@ -349,6 +350,7 @@ export default class UserController {
     permissions: string[];
     position: string;
     image: string;
+    baseSalary: number;
   }) => {
     const session = await getFlashSession(this.request.headers.get("Cookie"));
 
@@ -396,6 +398,7 @@ export default class UserController {
         permissions,
         position,
         image,
+        baseSalary,
       });
 
       session.flash("message", {
