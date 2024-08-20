@@ -22,8 +22,6 @@ export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 export default function App() {
   const { message } = useLoaderData<typeof loader>();
 
-  console.log(message);
-
   useEffect(() => {
     if (message) {
       switch (message.status) {
@@ -59,7 +57,7 @@ export default function App() {
         <NextUIProvider>
           <ThemeProvider attribute="class" defaultTheme="light">
             <Toaster position="bottom-right" richColors />
-            <Outlet />
+            <Outlet context={{ flashMessage: message }} />
             <ScrollRestoration />
             <Scripts />
             <LiveReload />

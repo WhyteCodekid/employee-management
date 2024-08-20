@@ -6,6 +6,7 @@ export type UserInterface = {
   username: string;
   email: string;
   role?: string;
+  phone: string;
   password: string;
   permissions?: [{ name: string; action: string }];
   createdAt: Date;

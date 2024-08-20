@@ -10,7 +10,7 @@ export default function SearchAndCreateRecordBar({
   formIntent = "create",
   searchValue,
   pageValue,
-  actionData,
+  flashMessage,
 }: {
   buttonText?: string;
   children: ReactNode;
@@ -18,16 +18,16 @@ export default function SearchAndCreateRecordBar({
   formIntent?: string;
   searchValue?: string;
   pageValue?: number;
-  actionData: any;
+  flashMessage: { message: string; status: "error" | "success" };
 }) {
   const createRecordDisclosure = useDisclosure();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (actionData) {
+    if (flashMessage && flashMessage.status === "success") {
       createRecordDisclosure.onClose();
     }
-  }, [actionData]);
+  }, [flashMessage]);
 
   return (
     <div className="flex items-center justify-between py-4 px-4">

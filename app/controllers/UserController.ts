@@ -554,7 +554,7 @@ export default class UserController {
         title: "User Deleted",
         status: "success",
       });
-      return redirect(path, {
+      return redirect("/admin/users", {
         headers: {
           "Set-Cookie": await commitFlashSession(session),
         },
@@ -564,7 +564,7 @@ export default class UserController {
         title: "Error Deleting User!",
         status: "error",
       });
-      return redirect(path, {
+      return redirect("/admin/users", {
         headers: {
           "Set-Cookie": await commitFlashSession(session),
         },
