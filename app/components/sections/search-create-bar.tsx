@@ -24,7 +24,7 @@ export default function SearchAndCreateRecordBar({
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (flashMessage.status === "success") {
+    if (flashMessage && flashMessage.status === "success") {
       createRecordDisclosure.onClose();
     }
   }, [flashMessage]);

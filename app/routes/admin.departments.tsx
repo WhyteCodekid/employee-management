@@ -1,6 +1,6 @@
 import { Button, TableCell, TableRow } from "@nextui-org/react";
 import { ActionFunction, LoaderFunction } from "@remix-run/node";
-import { useLoaderData, useNavigate } from "@remix-run/react";
+import { useLoaderData, useNavigate, useOutletContext } from "@remix-run/react";
 import TextInput from "~/components/inputs/text-input";
 import TextareaInput from "~/components/inputs/textarea";
 import SearchAndCreateRecordBar from "~/components/sections/search-create-bar";
@@ -9,6 +9,10 @@ import CustomTable from "~/components/ui/new-table";
 import DepartmentController from "~/controllers/DepartmentController";
 
 export default function AdminDepartmentsManagement() {
+  const flashMessage = useOutletContext<{
+    message: string;
+    status: "error" | "success";
+  }>();
   const { search_term, page, departments } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
 
@@ -22,6 +26,7 @@ export default function AdminDepartmentsManagement() {
         searchValue={search_term}
         pageValue={page}
         formIntent="create-department"
+        flashMessage={flashMessage}
       >
         <div className="flex flex-col gap-5">
           <TextInput label="Name" name="name" />
