@@ -580,7 +580,7 @@ export default class UserController {
     role,
     department,
     phone,
-    staffId,
+
     dateOfBirth,
     permissions,
     position,
@@ -593,7 +593,7 @@ export default class UserController {
     role: string;
     department: string;
     phone: string;
-    staffId: string;
+
     dateOfBirth: string;
     permissions: string[];
     position: string;
@@ -618,20 +618,6 @@ export default class UserController {
         }
       }
 
-      // Check for unique staff ID
-      if (staffId) {
-        const staffIdExist = await User.findOne({
-          staffId: staffId,
-          _id: { $ne: userId },
-        });
-        if (staffIdExist) {
-          errors.push({
-            field: "staffId",
-            message: "Staff ID already in use",
-          });
-        }
-      }
-
       // Check for unique email
       if (email) {
         const emailExist = await User.findOne({
@@ -651,8 +637,7 @@ export default class UserController {
         return {
           status: "error",
           code: 400,
-          message:
-            "User with phone number or staff ID or email already exists.",
+          message: "User with phone number or email already exists.",
           errors,
         };
       }
@@ -666,7 +651,6 @@ export default class UserController {
           role,
           department,
           phone,
-          staffId,
           dateOfBirth,
           permissions,
           position,
