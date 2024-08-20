@@ -15,6 +15,7 @@ export default function AdminDepartmentsManagement() {
   }>();
   const { search_term, page, departments } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
+  console.log(departments);
 
   return (
     <div>
@@ -78,10 +79,12 @@ export const loader: LoaderFunction = async ({ request }) => {
   const page = parseInt(url.searchParams.get("page") || "1");
 
   const departmentController = await new DepartmentController(request);
-  const { departments, totalPages } = departmentController.getDepartments({
-    page,
-    search_term,
-  });
+  const { departments, totalPages } = await departmentController.getDepartments(
+    {
+      page,
+      search_term,
+    }
+  );
 
   return {
     search_term,
