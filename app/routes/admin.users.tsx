@@ -1,4 +1,10 @@
-import { Button, SelectItem, TableCell, TableRow } from "@nextui-org/react";
+import {
+  Button,
+  Chip,
+  SelectItem,
+  TableCell,
+  TableRow,
+} from "@nextui-org/react";
 import { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { useLoaderData, useNavigate } from "@remix-run/react";
 import { useState } from "react";
@@ -62,7 +68,14 @@ export default function AdminEmployeesManagement() {
 
       <div className="px-4">
         <CustomTable
-          columns={["Name", "Description", "Actions"]}
+          columns={[
+            "Staff ID",
+            "Full Name",
+            "Email",
+            "Phone",
+            "Role",
+            "Actions",
+          ]}
           page={page}
           setPage={(page) =>
             navigate(`?page=${page}&search_term=${search_term}`)
@@ -71,9 +84,28 @@ export default function AdminEmployeesManagement() {
         >
           {employees?.users?.map((employee: UserInterface, index: number) => (
             <TableRow key={index}>
-              <TableCell>{employee.firstName}</TableCell>
-              <TableCell>{employee.firstName}</TableCell>
-              <TableCell>{employee.firstName}</TableCell>
+              <TableCell>{`AEMS${employee.staffId}`}</TableCell>
+              <TableCell>{`${employee.firstName} ${employee.lastName}`}</TableCell>
+              <TableCell>{employee.email}</TableCell>
+              <TableCell>{employee.phone}</TableCell>
+              <TableCell>
+                <Chip
+                  size="sm"
+                  variant="flat"
+                  classNames={{ content: "capitalize" }}
+                  color={employee.role === "admin" ? "success" : "warning"}
+                >
+                  {employee.role}
+                </Chip>
+              </TableCell>
+              <TableCell className="flex items-center gap-2">
+                <Button variant="flat" color="primary" size="sm">
+                  Edit
+                </Button>
+                <Button variant="flat" color="danger" size="sm">
+                  Delete
+                </Button>
+              </TableCell>
             </TableRow>
           ))}
         </CustomTable>
@@ -89,8 +121,7 @@ export const action: ActionFunction = async ({ request }) => {
   const userController = new UserController(request);
   if (formValues.intent === "create-employee") {
     await userController.createUser(formValues);
-    console.log(response);
-    return response;
+    return {};
   }
 
   return null;

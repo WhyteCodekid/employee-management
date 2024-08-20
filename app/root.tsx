@@ -22,6 +22,8 @@ export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 export default function App() {
   const { message } = useLoaderData<typeof loader>();
 
+  console.log(message);
+
   useEffect(() => {
     if (message) {
       switch (message.status) {

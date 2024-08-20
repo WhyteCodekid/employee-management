@@ -42,7 +42,7 @@ const CustomTable = ({
           wrapper:
             "vertical-scrollbar horizontal-scrollbar shadow-none rounded-2xl dark:border border-white/5",
           th: "",
-          td: "font-nunito text-xs text-slate-500 dark:text-slate-200 ",
+          td: "font-quicksand text-xs text-slate-500 dark:text-slate-200",
         }}
       >
         <TableHeader>

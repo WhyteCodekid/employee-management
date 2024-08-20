@@ -413,7 +413,7 @@ export default class UserController {
         title: "Something went wrong!",
         status: "error",
       });
-      return redirect(path, {
+      return redirect("/admin/users", {
         headers: {
           "Set-Cookie": await commitFlashSession(session),
         },
