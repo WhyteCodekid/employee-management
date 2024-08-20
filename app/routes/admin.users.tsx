@@ -19,6 +19,7 @@ import Header from "~/components/ui/header";
 import CustomTable from "~/components/ui/new-table";
 import UserController from "~/controllers/UserController";
 import { UserInterface } from "~/utils/types";
+import * as faceapi from "face-api.js";
 
 export default function AdminEmployeesManagement() {
   const flashMessage = useOutletContext<{
@@ -26,12 +27,12 @@ export default function AdminEmployeesManagement() {
     status: "error" | "success";
   }>();
   const { search_term, page, employees } = useLoaderData<typeof loader>();
-
   const navigate = useNavigate();
 
   // state to handle base64 image
   const [imageString, setImageString] = useState("");
-
+  const [processingImage, setProcessingImage] = useState(false);
+  const [descriptor, setDescriptor] = useState(null);
   // delete user stuff
   const deleteDisclosure = useDisclosure();
   const [userId, setUserId] = useState("");
@@ -52,6 +53,50 @@ export default function AdminEmployeesManagement() {
     }
   }, [flashMessage]);
 
+  const getFaceDescriptor = async (image) => {
+    await faceapi.nets.ssdMobilenetv1.loadFromUri("/models");
+    await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
+    await faceapi.nets.faceRecognitionNet.loadFromUri("/models");
+
+    const detection = await faceapi
+      .detectSingleFace(image)
+      .withFaceLandmarks()
+      .withFaceDescriptor();
+
+    return detection ? detection.descriptor : null;
+  };
+
+  useEffect(() => {
+    if (imageString) {
+      setProcessingImage(true);
+
+      // Create an Image object from the base64 string
+      const image = new Image();
+      image.src = imageString;
+
+      image.onload = async () => {
+        const descriptor = await getFaceDescriptor(image);
+        if (descriptor) {
+          setDescriptor(descriptor);
+          console.log(descriptor);
+
+          // Send the face data to the server
+          // fetch("/api/add-face", {
+          //   method: "POST",
+          //   body: new URLSearchParams({
+          //     label: user,
+          //     descriptor: JSON.stringify(Array.from(descriptor)),
+          //   }),
+          // })
+          //   .then((response) => response.json())
+          //   .then((data) => console.log("Success:", data))
+          //   .catch((error) => console.error("Error:", error));
+        }
+        setProcessingImage(false);
+      };
+    }
+  }, [imageString]);
+
   return (
     <div>
       <Header title="Manage Employees" />
@@ -65,6 +110,11 @@ export default function AdminEmployeesManagement() {
         flashMessage={flashMessage}
       >
         <div className="flex flex-col gap-5">
+          <input
+            type="hidden"
+            name="descriptor"
+            value={JSON.stringify(Array.from(descriptor))}
+          />
           <TextInput label="First Name" name="firstName" isRequired />
           <TextInput label="Last Name" name="lastName" isRequired />
           <TextInput label="Email" name="email" type="email" isRequired />
@@ -83,6 +133,7 @@ export default function AdminEmployeesManagement() {
             type="number"
             isRequired
           />
+          {processingImage && <p>Processing image...</p>}
           <ImageInputWithPreview
             name="image"
             imageString={imageString}
@@ -238,9 +289,6 @@ export const action: ActionFunction = async ({ request }) => {
 
   const userController = new UserController(request);
   if (formValues.intent === "create-employee") {
-    // console.log(formValues);
-    // return null;
-
     return userController.createUser(formValues);
   }
   if (formValues.intent === "delete") {

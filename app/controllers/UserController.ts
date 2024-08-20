@@ -5,6 +5,7 @@ import {
   type SessionStorage,
 } from "@remix-run/node";
 import bcrypt from "bcryptjs";
+import Face from "~/models/Faces";
 import User from "~/models/User";
 import { commitFlashSession, getFlashSession } from "~/utils/flash-session";
 // import generateOTP from "~/utils/generateOTP";
@@ -339,6 +340,7 @@ export default class UserController {
     position,
     image,
     baseSalary,
+    descriptor,
   }: {
     firstName: string;
     lastName: string;
@@ -351,6 +353,7 @@ export default class UserController {
     position: string;
     image: string;
     baseSalary: number;
+    descriptor: string;
   }) => {
     const session = await getFlashSession(this.request.headers.get("Cookie"));
 
@@ -399,6 +402,12 @@ export default class UserController {
         position,
         image,
         baseSalary,
+      });
+
+      const newFace = await Face.create({
+        user: user?._id,
+        image: "raj.jpg",
+        descriptor: JSON.parse(descriptor),
       });
 
       session.flash("message", {
