@@ -584,6 +584,7 @@ export default class UserController {
     dateOfBirth,
     permissions,
     position,
+    baseSalary,
   }: {
     userId: string;
     firstName: string;
@@ -596,11 +597,11 @@ export default class UserController {
     dateOfBirth: string;
     permissions: string[];
     position: string;
+    baseSalary: number;
   }) => {
     const session = await getFlashSession(this.request.headers.get("Cookie"));
 
     try {
-      // Initialize an array to collect validation errors
       const errors = [];
 
       // Check for unique phone number
@@ -669,6 +670,7 @@ export default class UserController {
           dateOfBirth,
           permissions,
           position,
+          baseSalary,
         },
         {
           new: true, // Return the updated document
@@ -680,20 +682,27 @@ export default class UserController {
         throw new Error("User not found");
       }
 
-      return {
+      session.flash("message", {
+        title: "User updated successfuly!",
         status: "success",
-        code: 200,
-        message: "User updated successfully",
-        data: updatedUser,
-      };
+      });
+      return redirect("/admin/users", {
+        headers: {
+          "Set-Cookie": await commitFlashSession(session),
+        },
+      });
     } catch (error) {
       console.log(error);
 
-      return {
-        status: "error",
-        code: 400,
-        message: "Error updating User",
-      };
+      session.flash("message", {
+        title: "Something unexpected occured!",
+        status: "success",
+      });
+      return redirect("/admin/users", {
+        headers: {
+          "Set-Cookie": await commitFlashSession(session),
+        },
+      });
     }
   };
 
