@@ -39,3 +39,12 @@ export type AttendanceInterface = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+export type FaceInterface = {
+  _id: string;
+  user: UserInterface;
+  image: string;
+  descriptor: number[];
+  createdAt: Date;
+  updatedAt: Date;
+};

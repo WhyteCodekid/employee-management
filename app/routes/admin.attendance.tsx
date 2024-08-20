@@ -73,12 +73,13 @@ const App = () => {
               ])
           );
 
-          const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.6); // Adjust the threshold as needed
+          const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.41); // Adjust the threshold as needed
 
           resizedDetections.forEach((detection) => {
             const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
             const box = detection.detection.box;
             const { label, distance } = bestMatch;
+            console.log({ label, distance });
 
             // Draw the label and the box
             const drawBox = new faceapi.draw.DrawBox(box, {
@@ -102,8 +103,8 @@ const App = () => {
   return (
     <div className="">
       <Header title="Manage Departments" />
-      <video ref={videoRef} autoPlay muted width="120" height="560" />
-      {/* <canvas ref={canvasRef} style={{ position: "absolute" }} /> */}
+      <video ref={videoRef} autoPlay muted width="720" height="560" />
+      <canvas ref={canvasRef} style={{ position: "absolute" }} />
 
       <SearchAndCreateRecordBar
         buttonText="New Department"

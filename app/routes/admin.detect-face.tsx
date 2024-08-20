@@ -5,6 +5,8 @@ import { Form } from "@remix-run/react";
 
 const App = () => {
   const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState("");
+  console.log(user);
 
   //   const getFace = async (e) => {
   //     const loadImage = async () => {
@@ -50,7 +52,11 @@ const App = () => {
       <h1>Encode face and save to JSON</h1>
       {loading && <p>Loading...</p>}
       <Form>
-        <Input name="name" label="Name" />
+        <Input
+          name="name"
+          label="Name"
+          onValueChange={(value) => setUser(value)}
+        />
         <Input
           type="file"
           label="Select face"
@@ -70,7 +76,7 @@ const App = () => {
                   fetch("/api/add-face", {
                     method: "POST",
                     body: new URLSearchParams({
-                      label: "Kwamina",
+                      label: user,
                       descriptor: JSON.stringify(Array.from(descriptor)),
                     }),
                   })

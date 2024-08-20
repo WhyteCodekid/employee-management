@@ -120,8 +120,7 @@ export const action: ActionFunction = async ({ request }) => {
 
   const userController = new UserController(request);
   if (formValues.intent === "create-employee") {
-    await userController.createUser(formValues);
-    return {};
+    return await userController.createUser(formValues);
   }
 
   return null;
