@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Button,
   Chip,
@@ -32,7 +33,7 @@ export default function AdminEmployeesManagement() {
   // state to handle base64 image
   const [imageString, setImageString] = useState("");
   const [processingImage, setProcessingImage] = useState(false);
-  const [descriptor, setDescriptor] = useState(null);
+  const [descriptor, setDescriptor] = useState<any>(null);
   // delete user stuff
   const deleteDisclosure = useDisclosure();
   const [userId, setUserId] = useState("");
@@ -113,7 +114,7 @@ export default function AdminEmployeesManagement() {
           <input
             type="hidden"
             name="descriptor"
-            value={JSON.stringify(Array.from(descriptor))}
+            value={JSON.stringify(Array.from(descriptor || []))}
           />
           <TextInput label="First Name" name="firstName" isRequired />
           <TextInput label="Last Name" name="lastName" isRequired />
