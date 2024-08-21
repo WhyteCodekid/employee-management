@@ -103,8 +103,6 @@ const App = () => {
   return (
     <div className="">
       <Header title="Manage Departments" />
-      <video ref={videoRef} autoPlay muted width="720" height="560" />
-      <canvas ref={canvasRef} style={{ position: "absolute" }} />
 
       <SearchAndCreateRecordBar
         buttonText="New Department"
@@ -119,28 +117,37 @@ const App = () => {
         </div>
       </SearchAndCreateRecordBar>
 
-      <CustomTable
-        columns={["Name", "Description", "Actions"]}
-        page={page}
-        setPage={(page) => navigate(`?page=${page}&search_term=${search_term}`)}
-        totalPages={1}
-      >
-        {departments?.map(
-          (
-            department: { name: string; description: string },
-            index: number
-          ) => (
-            <TableRow key={index}>
-              <TableCell>{department.name}</TableCell>
-              <TableCell>{department.description}</TableCell>
-              <TableCell className="flex items-center gap-3">
-                <Button>Edit</Button>
-                <Button>Delete</Button>
-              </TableCell>
-            </TableRow>
-          )
-        )}
-      </CustomTable>
+      <section className="flex gap-3">
+        <div>
+          <video ref={videoRef} autoPlay muted width="520" height="560" />
+          <canvas ref={canvasRef} style={{ position: "absolute" }} />
+        </div>
+
+        <CustomTable
+          columns={["Name", "Description", "Actions"]}
+          page={page}
+          setPage={(page) =>
+            navigate(`?page=${page}&search_term=${search_term}`)
+          }
+          totalPages={1}
+        >
+          {departments?.map(
+            (
+              department: { name: string; description: string },
+              index: number
+            ) => (
+              <TableRow key={index}>
+                <TableCell>{department.name}</TableCell>
+                <TableCell>{department.description}</TableCell>
+                <TableCell className="flex items-center gap-3">
+                  <Button>Edit</Button>
+                  <Button>Delete</Button>
+                </TableCell>
+              </TableRow>
+            )
+          )}
+        </CustomTable>
+      </section>
     </div>
   );
 };
