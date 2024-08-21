@@ -1,11 +1,9 @@
-import React, { useEffect, useRef } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useEffect, useRef } from "react";
 import * as faceapi from "face-api.js";
 import knownFaces from "~/assets/faces.json";
 import { TableRow, TableCell, Button } from "@nextui-org/react";
 import { useLoaderData, useNavigate } from "@remix-run/react";
-import TextInput from "~/components/inputs/text-input";
-import TextareaInput from "~/components/inputs/textarea";
-import SearchAndCreateRecordBar from "~/components/sections/search-create-bar";
 import Header from "~/components/ui/header";
 import CustomTable from "~/components/ui/new-table";
 import { LoaderFunction } from "@remix-run/node";
@@ -16,8 +14,8 @@ const App = () => {
   const { search_term, page, departments } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
 
-  const videoRef = useRef();
-  const canvasRef = useRef();
+  const videoRef = useRef<any>();
+  const canvasRef = useRef<any>();
 
   useEffect(() => {
     const loadModels = async () => {
@@ -132,26 +130,26 @@ const App = () => {
 
   return (
     <div className="flex flex-col gap-4 h-screen overflow-y-hidden">
-      <Header title="Manage Departments" hideUserDropdown={true} />
+      <Header title="Facial Recognition Scanner" hideUserDropdown={true} />
 
-      <section className="grid grid-cols-3 gap-5 px-4 flex-1 overflow-y-hidden">
-        <div className="col-span-2 border relative">
+      <section className="grid grid-cols-2 gap-5 px-4 flex-1 overflow-y-hidden">
+        <div className="relative">
           <video
             ref={videoRef}
             autoPlay
             muted
-            width="50%"
+            width="100%"
             height="560"
             className="border"
           />
           <canvas
             ref={canvasRef}
-            className="border border-blue-500 absolute top-0 left-0"
+            className="border border-blue-500 absolute top-0 left-0 w-full h-[540px]"
           />
         </div>
 
         <CustomTable
-          columns={["Name", "Description", "Actions"]}
+          columns={["Staff ID", "Staff Name", "Time In", "Time Out"]}
           page={page}
           setPage={(page) =>
             navigate(`?page=${page}&search_term=${search_term}`)
@@ -166,10 +164,8 @@ const App = () => {
               <TableRow key={index}>
                 <TableCell>{department.name}</TableCell>
                 <TableCell>{department.description}</TableCell>
-                <TableCell className="flex items-center gap-3">
-                  <Button>Edit</Button>
-                  <Button>Delete</Button>
-                </TableCell>
+                <TableCell>{department.description}</TableCell>
+                <TableCell>{department.description}</TableCell>
               </TableRow>
             )
           )}
@@ -186,11 +182,13 @@ export const loader: LoaderFunction = async ({ request }) => {
   const search_term = url.searchParams.get("search_term") || "";
   const page = parseInt(url.searchParams.get("page") || "1");
 
-  const departmentController = await new DepartmentController(request);
-  const { departments, totalPages } = departmentController.getDepartments({
-    page,
-    search_term,
-  });
+  const departmentController = new DepartmentController(request);
+  const { departments, totalPages } = await departmentController.getDepartments(
+    {
+      page,
+      search_term,
+    }
+  );
 
   return {
     search_term,
