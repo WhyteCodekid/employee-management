@@ -1,19 +1,19 @@
 import React, { useEffect, useRef } from "react";
 import * as faceapi from "face-api.js";
-import knownFaces from "~/assets/faces.json";
 import { TableRow, TableCell, Button } from "@nextui-org/react";
 import { useLoaderData, useNavigate } from "@remix-run/react";
-import TextInput from "~/components/inputs/text-input";
-import TextareaInput from "~/components/inputs/textarea";
-import SearchAndCreateRecordBar from "~/components/sections/search-create-bar";
 import Header from "~/components/ui/header";
 import CustomTable from "~/components/ui/new-table";
 import { LoaderFunction } from "@remix-run/node";
 import DepartmentController from "~/controllers/DepartmentController";
 import axios from "axios";
+import UserController from "~/controllers/UserController";
+import User from "~/models/User";
+import Face from "~/models/Faces";
 
 const App = () => {
-  const { search_term, page, departments } = useLoaderData<typeof loader>();
+  const { search_term, page, departments, users } =
+    useLoaderData<typeof loader>();
   const navigate = useNavigate();
 
   const videoRef = useRef();
@@ -67,14 +67,14 @@ const App = () => {
           faceapi.draw.drawDetections(canvas, resizedDetections);
           faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
 
-          const labeledDescriptors = knownFaces.map(
+          const labeledDescriptors = users.map(
             (f) =>
-              new faceapi.LabeledFaceDescriptors(f.label, [
+              new faceapi.LabeledFaceDescriptors(f.user?._id, [
                 new Float32Array(f.descriptor),
               ])
           );
 
-          const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.41); // Adjust the threshold as needed
+          const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.61); // Adjust the threshold as needed
 
           let faceFound = false;
 
@@ -96,7 +96,7 @@ const App = () => {
 
               // make api request to take attendance
               axios.post("/take-attendance", {
-                user: "user_id",
+                user: label,
               });
             }
           });
@@ -186,6 +186,8 @@ export const loader: LoaderFunction = async ({ request }) => {
   const search_term = url.searchParams.get("search_term") || "";
   const page = parseInt(url.searchParams.get("page") || "1");
 
+  const users = await Face.find().populate("user");
+
   const departmentController = await new DepartmentController(request);
   const { departments, totalPages } = departmentController.getDepartments({
     page,
@@ -197,5 +199,6 @@ export const loader: LoaderFunction = async ({ request }) => {
     page,
     departments,
     totalPages,
+    users,
   };
 };

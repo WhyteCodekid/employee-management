@@ -30,7 +30,6 @@ export default function AdminEmployeesManagement() {
   const { search_term, page, users, totalPages } =
     useLoaderData<typeof loader>();
   const navigate = useNavigate();
-  console.log({ users, totalPages });
 
   // state to handle base64 image
   const [imageString, setImageString] = useState("");

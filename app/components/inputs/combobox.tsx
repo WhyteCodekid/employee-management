@@ -39,7 +39,6 @@ export const DepartmentsCombobox = ({
       keepPreviousData: true,
     }
   );
-  console.log(comboboxSWR.data);
 
   return (
     <>
@@ -121,7 +120,6 @@ export const SupportUsersCombobox = ({
       keepPreviousData: true,
     }
   );
-  console.log(comboboxSWR.data);
 
   return (
     <>
