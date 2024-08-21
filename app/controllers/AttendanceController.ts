@@ -1,7 +1,7 @@
 import { redirect } from "@remix-run/node";
-import type { DepartmentInterface } from "../utils/types";
+import type { AttendanceInterface } from "../utils/types";
 import { commitFlashSession, getFlashSession } from "~/utils/flash-session";
-import Department from "~/models/Department";
+import Attendance from "~/models/Attendance";
 
 export default class AttendanceController {
   private request: Request;
@@ -16,13 +16,13 @@ export default class AttendanceController {
   }
 
   /**
-   * Retrieve all Department
+   * Retrieve all Attendance
    * @param param0 page
    * @param param1 search_term
    * @param param2 limit
-   * @returns {departments: DepartmentInterface, totalPages: number}
+   * @returns {attendances: AttendanceInterface, totalPages: number}
    */
-  public async getDepartments({
+  public async getAttendances({
     page,
     search_term,
     limit = 10,
@@ -31,7 +31,7 @@ export default class AttendanceController {
     search_term?: string;
     limit?: number;
   }): Promise<
-    { departments: DepartmentInterface[]; totalPages: number } | any
+    { attendances: AttendanceInterface[]; totalPages: number } | any
   > {
     const session = await getFlashSession(this.request.headers.get("Cookie"));
 
@@ -67,7 +67,7 @@ export default class AttendanceController {
       : {};
 
     try {
-      const departments = await Department.find(searchFilter)
+      const attendances = await Attendance.find(searchFilter)
         .skip(skipCount)
         .limit(limit)
         .sort({
@@ -75,18 +75,18 @@ export default class AttendanceController {
         })
         .exec();
 
-      const totalDepartmentsCount = await Department.countDocuments(
+      const totalAttendancesCount = await Attendance.countDocuments(
         searchFilter
       ).exec();
-      const totalPages = Math.ceil(totalDepartmentsCount / limit);
+      const totalPages = Math.ceil(totalAttendancesCount / limit);
 
-      return { departments, totalPages };
+      return { attendances, totalPages };
     } catch (error) {
       console.log(error);
       session.flash("message", {
         title: "Error!",
         status: "error",
-        message: "Error retrieving departments",
+        message: "Error retrieving attendances",
       });
 
       return redirect(this.path, {
@@ -94,18 +94,18 @@ export default class AttendanceController {
           "Set-Cookie": await commitFlashSession(session),
         },
       });
-      // throw new Error("Error retrieving departments");
+      // throw new Error("Error retrieving attendances");
     }
   }
 
   /**
-   * Retrieve a single Department
+   * Retrieve a single Attendance
    * @param id string
-   * @returns DepartmentInterface
+   * @returns AttendanceInterface
    */
-  public async getDepartment({ id }: { id: string }) {
+  public async getAttendance({ id }: { id: string }) {
     try {
-      const department = await Department.findById(id);
+      const department = await Attendance.findById(id);
       return department;
     } catch (error) {
       console.error("Error retrieving department:", error);
@@ -118,9 +118,9 @@ export default class AttendanceController {
    * @param name string
    * @param parent string
    * @param description string
-   * @returns DepartmentInterface
+   * @returns AttendanceInterface
    */
-  public createDepartment = async ({
+  public createAttendance = async ({
     name,
     parent,
     description,
@@ -132,13 +132,13 @@ export default class AttendanceController {
     const session = await getFlashSession(this.request.headers.get("Cookie"));
 
     try {
-      const existingDepartment = await Department.findOne({ name });
+      const existingAttendance = await Attendance.findOne({ name });
 
-      if (existingDepartment) {
+      if (existingAttendance) {
         return {
           status: "error",
           code: 400,
-          message: "Department already exists",
+          message: "Attendance already exists",
           errors: [
             {
               field: "name",
@@ -149,7 +149,7 @@ export default class AttendanceController {
         };
       }
 
-      const department = await Department.create({
+      const department = await Attendance.create({
         name,
         parent: parent || null,
         description,
@@ -157,10 +157,10 @@ export default class AttendanceController {
       });
 
       session.flash("message", {
-        title: "Department created!",
+        title: "Attendance created!",
         status: "success",
       });
-      return redirect("/admin/departments", {
+      return redirect("/admin/attendances", {
         headers: {
           "Set-Cookie": await commitFlashSession(session),
         },
@@ -168,7 +168,7 @@ export default class AttendanceController {
       return {
         status: "success",
         code: 200,
-        message: "Department added successfully",
+        message: "Attendance added successfully",
         data: department,
       };
     } catch (error) {
@@ -177,7 +177,7 @@ export default class AttendanceController {
         title: "Something went wrong!",
         status: "error",
       });
-      return redirect("/admin/departments", {
+      return redirect("/admin/attendances", {
         headers: {
           "Set-Cookie": await commitFlashSession(session),
         },
@@ -198,7 +198,7 @@ export default class AttendanceController {
    * @param param3 description
    * @returns null
    */
-  public updateDepartment = async ({
+  public updateAttendance = async ({
     _id,
     name,
     parent,
@@ -216,7 +216,7 @@ export default class AttendanceController {
     const session = await getFlashSession(this.request.headers.get("Cookie"));
 
     try {
-      const updated = await Department.findByIdAndUpdate(
+      const updated = await Attendance.findByIdAndUpdate(
         _id,
         {
           name,
@@ -229,10 +229,10 @@ export default class AttendanceController {
       );
 
       session.flash("message", {
-        title: "Department updated successfully!",
+        title: "Attendance updated successfully!",
         status: "success",
       });
-      return redirect("/admin/departments", {
+      return redirect("/admin/attendances", {
         headers: {
           "Set-Cookie": await commitFlashSession(session),
         },
@@ -241,7 +241,7 @@ export default class AttendanceController {
       return {
         status: "success",
         code: 200,
-        message: "Department updated successfully",
+        message: "Attendance updated successfully",
         data: updated,
       };
     } catch (error) {
@@ -249,7 +249,7 @@ export default class AttendanceController {
         title: "Something went wrong!",
         status: "error",
       });
-      return redirect("/admin/departments", {
+      return redirect("/admin/attendances", {
         headers: {
           "Set-Cookie": await commitFlashSession(session),
         },
@@ -264,20 +264,20 @@ export default class AttendanceController {
   };
 
   /**
-   * Delete Department
+   * Delete Attendance
    * @param param0 _id
    * @returns null
    */
-  public deleteDepartment = async ({ _id }: { _id: string }) => {
+  public deleteAttendance = async ({ _id }: { _id: string }) => {
     const session = await getFlashSession(this.request.headers.get("Cookie"));
 
     try {
-      await Department.findByIdAndDelete(_id);
+      await Attendance.findByIdAndDelete(_id);
 
       return {
         status: "success",
         code: 200,
-        message: "Department deleted successfully",
+        message: "Attendance deleted successfully",
       };
     } catch (error) {
       console.log(error);

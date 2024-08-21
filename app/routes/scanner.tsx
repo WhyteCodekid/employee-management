@@ -75,7 +75,7 @@ const App = () => {
               ])
           );
 
-          const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.61); // Adjust the threshold as needed
+          const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.81); // Adjust the threshold as needed
 
           let faceFound = false;
 
@@ -83,6 +83,7 @@ const App = () => {
             const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
             const box = detection.detection.box;
             const { label, distance } = bestMatch;
+            console.log({ label });
 
             if (label !== "unknown") {
               faceFound = true;
