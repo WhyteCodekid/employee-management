@@ -1,5 +1,7 @@
+import { LoaderFunction } from "@remix-run/node";
 import { Outlet, useOutletContext } from "@remix-run/react";
 import Sidebar from "~/components/ui/sidebar";
+import UserController from "~/controllers/UserController";
 
 export default function AdminLayout() {
   const { flashMessage } = useOutletContext<{
@@ -16,3 +18,11 @@ export default function AdminLayout() {
     </div>
   );
 }
+
+export const loader: LoaderFunction = async ({ request }) => {
+  const adminControlle = new UserController(request);
+  const user = await adminControlle.getUser();
+  console.log(user);
+
+  return {};
+};

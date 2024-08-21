@@ -14,6 +14,10 @@ const userSchema = new Schema<UserInterface>(
       unique: false,
       // match: [emailRegex, "Invalid email format"],
     },
+    password: {
+      type: String,
+      required: true,
+    },
     dateOfBirth: {
       type: String,
       required: false,

@@ -49,12 +49,6 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const authSession = await getSession(request.headers.get("Cookie"));
-  const token = authSession.get("token");
-
-  // redirect if token exists
-  if (token) {
-    return redirect("/admin");
-  }
-  return {};
+  const adminController = await new UserController(request);
+  return (await adminController.getUserId()) ? redirect("/admin") : null;
 };

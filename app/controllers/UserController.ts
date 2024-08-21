@@ -194,6 +194,7 @@ export default class UserController {
       session.flash("message", {
         title: "Invalid Credentials",
         status: "error",
+        description: "Incorrect password",
       });
       return redirect(`/login`, {
         headers: {
@@ -202,7 +203,7 @@ export default class UserController {
       });
     }
 
-    return this.createUserSession(user.id, "/user");
+    return this.createUserSession(user.id, "/admin");
   }
 
   public updateProfile = async ({
