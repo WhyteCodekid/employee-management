@@ -26,8 +26,10 @@ export default function AdminEmployeesManagement() {
     message: string;
     status: "error" | "success";
   }>();
-  const { search_term, page, employees } = useLoaderData<typeof loader>();
+  const { search_term, page, users, totalPages } =
+    useLoaderData<typeof loader>();
   const navigate = useNavigate();
+  console.log({ users, totalPages });
 
   // state to handle base64 image
   const [imageString, setImageString] = useState("");
@@ -113,7 +115,7 @@ export default function AdminEmployeesManagement() {
           <input
             type="hidden"
             name="descriptor"
-            value={JSON.stringify(Array.from(descriptor))}
+            value={JSON.stringify(Array.from(descriptor || []))}
           />
           <TextInput label="First Name" name="firstName" isRequired />
           <TextInput label="Last Name" name="lastName" isRequired />
@@ -157,9 +159,9 @@ export default function AdminEmployeesManagement() {
           setPage={(page) =>
             navigate(`?page=${page}&search_term=${search_term}`)
           }
-          totalPages={employees?.totalPages}
+          totalPages={totalPages}
         >
-          {employees?.users?.map((employee: UserInterface, index: number) => (
+          {users?.map((employee: UserInterface, index: number) => (
             <TableRow key={index}>
               <TableCell>{`AEMS${employee.staffId}`}</TableCell>
               <TableCell>{`${employee.firstName} ${employee.lastName}`}</TableCell>
@@ -304,7 +306,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   const page = parseInt(url.searchParams.get("page") || "1");
 
   const userController = new UserController(request);
-  const employees = await userController.getUsers({
+  const { users, totalPages } = await userController.getUsers({
     page,
     search_term,
     limit: 15,
@@ -313,6 +315,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   return {
     search_term,
     page,
-    employees,
+    users,
+    totalPages,
   };
 };
