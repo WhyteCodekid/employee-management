@@ -68,6 +68,7 @@ export default class AttendanceController {
 
     try {
       const attendances = await Attendance.find(searchFilter)
+        .populate("user")
         .skip(skipCount)
         .limit(limit)
         .sort({
