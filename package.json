@@ -16,6 +16,7 @@
     "@remix-run/node": "^2.11.2",
     "@remix-run/react": "^2.11.2",
     "@remix-run/serve": "^2.11.2",
+    "axios": "^1.7.4",
     "bcryptjs": "^2.4.3",
     "face-api.js": "^0.22.2",
     "framer-motion": "^11.3.28",

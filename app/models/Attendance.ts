@@ -9,6 +9,13 @@ const schema = new Schema<AttendanceInterface>(
       ref: "users",
       required: true,
     },
+    chekInTime: {
+      type: Date,
+      default: Date.now(),
+    },
+    chekOutTime: {
+      type: Date,
+    },
   },
   {
     timestamps: true,

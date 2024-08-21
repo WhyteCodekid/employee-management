@@ -10,6 +10,7 @@ import Header from "~/components/ui/header";
 import CustomTable from "~/components/ui/new-table";
 import { LoaderFunction } from "@remix-run/node";
 import DepartmentController from "~/controllers/DepartmentController";
+import axios from "axios";
 
 const App = () => {
   const { search_term, page, departments } = useLoaderData<typeof loader>();
@@ -37,7 +38,7 @@ const App = () => {
     };
 
     const handleVideoPlay = () => {
-      setInterval(async () => {
+      const processVideo = async () => {
         if (videoRef.current) {
           const detections = await faceapi
             .detectAllFaces(
@@ -75,20 +76,49 @@ const App = () => {
 
           const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.41); // Adjust the threshold as needed
 
+          let faceFound = false;
+
           resizedDetections.forEach((detection) => {
             const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
             const box = detection.detection.box;
             const { label, distance } = bestMatch;
-            console.log({ label, distance });
 
-            // Draw the label and the box
-            const drawBox = new faceapi.draw.DrawBox(box, {
-              label: `${label} (${distance.toFixed(2)})`,
-            });
-            drawBox.draw(canvas);
+            if (label !== "unknown") {
+              faceFound = true;
+              console.log({ label, distance });
+              console.log("Face found!");
+
+              // Draw the label and the box
+              const drawBox = new faceapi.draw.DrawBox(box, {
+                label: `${label} (${distance.toFixed(2)})`,
+              });
+              drawBox.draw(canvas);
+
+              // make api request to take attendance
+              axios.post("/take-attendance", {
+                user: "user_id",
+              });
+            }
           });
+
+          if (faceFound) {
+            console.log("Pausing detection for 10 seconds...");
+            clearInterval(intervalId);
+            setTimeout(() => {
+              intervalId = setInterval(processVideo, 500);
+            }, 10000); // Pause for 10 seconds
+          }
         }
-      }, 500); // Adjust the interval for performance
+      };
+
+      let intervalId = setInterval(processVideo, 500);
+
+      videoRef.current.addEventListener("play", processVideo);
+
+      return () => {
+        videoRef.current?.removeEventListener("play", processVideo);
+        clearInterval(intervalId);
+      };
     };
 
     loadModels().then(startVideo);
