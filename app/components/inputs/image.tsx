@@ -18,7 +18,6 @@ export const ImageInputWithPreview = ({
       const reader = new FileReader();
       reader.onloadend = () => {
         setImageString(reader?.result);
-        console.log(imageString);
       };
       reader.readAsDataURL(selectedFile);
     } else {
