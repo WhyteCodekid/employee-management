@@ -37,6 +37,8 @@ export type SettingsInterface = {
 export type AttendanceInterface = {
   _id: string;
   user: UserInterface;
+  chekInTime: Date;
+  chekOutTime: Date;
   createdAt: Date;
   updatedAt: Date;
 };
