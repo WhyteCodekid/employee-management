@@ -10,11 +10,10 @@ const schema = new Schema<AttendanceInterface>(
       required: true,
     },
     chekInTime: {
-      type: Date,
-      default: Date.now(),
+      type: String,
     },
     chekOutTime: {
-      type: Date,
+      type: String,
     },
   },
   {
