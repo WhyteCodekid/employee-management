@@ -32,23 +32,17 @@ export default function AdminEmployeesManagement() {
   const navigate = useNavigate();
 
   // delete user stuff
-  const deleteDisclosure = useDisclosure();
-  const [faqId, setFaqId] = useState("");
+  const approveDisclosure = useDisclosure();
+  const [leaveId, setLeaveId] = useState("");
 
   // edit user stuff
-  const editDisclosure = useDisclosure();
-  const [faq, setFaq] = useState<FaqInterface | null>(null);
-  useEffect(() => {
-    if (!editDisclosure.isOpen) {
-      setFaq(null);
-    }
-  }, [editDisclosure.onOpenChange]);
+  const declineDisclosure = useDisclosure();
 
   useEffect(() => {
     if (flashMessage && flashMessage.status === "success") {
-      setFaqId("");
-      deleteDisclosure.onClose();
-      editDisclosure.onClose();
+      setLeaveId("");
+      approveDisclosure.onClose();
+      declineDisclosure.onClose();
     }
   }, [flashMessage]);
 
@@ -123,25 +117,27 @@ export default function AdminEmployeesManagement() {
               <TableCell className="flex items-center gap-2">
                 <Button
                   variant="flat"
-                  color="primary"
+                  color="success"
                   size="sm"
                   onPress={() => {
-                    setFaq(faq);
-                    editDisclosure.onOpen();
+                    setLeaveId(leave._id);
+                    approveDisclosure.onOpen();
                   }}
+                  isDisabled={leave.status !== "pending"}
                 >
-                  Edit
+                  Approve
                 </Button>
                 <Button
                   variant="flat"
                   color="danger"
                   size="sm"
                   onPress={() => {
-                    setFaqId(faq._id);
-                    deleteDisclosure.onOpen();
+                    setLeaveId(leave._id);
+                    declineDisclosure.onOpen();
                   }}
+                  isDisabled={leave.status !== "pending"}
                 >
-                  Delete
+                  Decline
                 </Button>
               </TableCell>
             </TableRow>
@@ -151,56 +147,31 @@ export default function AdminEmployeesManagement() {
 
       {/* edit user modal */}
       <EditRecordModal
-        isModalOpen={editDisclosure.isOpen}
-        onCloseModal={editDisclosure.onClose}
-        title="Update Frequently Asked Question"
-        intent="update-faq"
+        isModalOpen={approveDisclosure.isOpen}
+        onCloseModal={approveDisclosure.onClose}
+        title="Approve Leave Request"
+        intent="approve-request"
         size="lg"
       >
-        <div className="flex flex-col gap-5">
-          <TextInput
-            label="Faq ID"
-            name="id"
-            value={faq?._id}
-            className="hidden"
-          />
-          <TextInput
-            label="Question"
-            name="question"
-            value={faq?.question}
-            onValueChange={(value) =>
-              setFaq((prev: any) => ({
-                ...prev,
-                question: value as string,
-              }))
-            }
-          />
-          <TextareaInput
-            label="Answer"
-            name="answer"
-            value={faq?.answer}
-            onValueChange={(value) =>
-              setFaq((prev: any) => ({
-                ...prev,
-                answer: value as string,
-              }))
-            }
-          />
-        </div>
+        <p className="font-quicksand">
+          Are you sure to approve this leave request?
+        </p>
+        <TextInput name="id" value={leaveId} className="hidden" />
       </EditRecordModal>
 
-      {/* delete user modal */}
-      <DeleteRecordModal
-        isModalOpen={deleteDisclosure.isOpen}
-        onCloseModal={deleteDisclosure.onClose}
-        title="Delete Frequently Asked Question"
+      {/* edit user modal */}
+      <EditRecordModal
+        isModalOpen={declineDisclosure.isOpen}
+        onCloseModal={declineDisclosure.onClose}
+        title="Decline Leave Request"
+        intent="decline-request"
+        size="lg"
       >
         <p className="font-quicksand">
-          Are you sure to delete this frequently asked question? This action
-          cannot be undone...
+          Are you sure to decline this leave request?
         </p>
-        <TextInput name="id" value={faqId} className="hidden" />
-      </DeleteRecordModal>
+        <TextInput name="id" value={leaveId} className="hidden" />
+      </EditRecordModal>
     </div>
   );
 }
@@ -209,22 +180,19 @@ export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
   const formValues = Object.fromEntries(formData.entries());
 
-  const faqController = new FaqController(request);
-  if (formValues.intent === "create-faq") {
-    return faqController.createFaq({
-      question: formValues.question as string,
-      answer: formValues.answer as string,
-    });
-  }
-  if (formValues.intent === "update-faq") {
-    return faqController.updateFaq({
+  const leaveController = new LeaveController(request);
+  if (formValues.intent === "approve-request") {
+    return await leaveController.changeStatus({
       id: formValues.id as string,
-      question: formValues.question as string,
-      answer: formValues.answer as string,
+      status: "approved",
     });
   }
-  if (formValues.intent === "delete") {
-    return faqController.deleteFaq({ id: formValues.id as string });
+
+  if (formValues.intent === "approve-request") {
+    return await leaveController.changeStatus({
+      id: formValues.id as string,
+      status: "rejected",
+    });
   }
 
   return null;

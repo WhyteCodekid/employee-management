@@ -272,9 +272,8 @@ export const loader: LoaderFunction = async ({ request }) => {
   const page = parseInt(url.searchParams.get("page") || "1");
 
   const leaveController = new LeaveController(request);
-  const { leaves, totalPages } = await leaveController.getLeaves({
+  const { leaves, totalPages } = await leaveController.getMyLeaves({
     page,
-    search_term,
     limit: 15,
     status,
   });
