@@ -66,6 +66,7 @@ const App = () => {
           canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
           faceapi.draw.drawDetections(canvas, resizedDetections);
           faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+          console.log(users);
 
           const labeledDescriptors = users.map((f) => {
             return new faceapi.LabeledFaceDescriptors(f.user?._id, [
@@ -74,17 +75,17 @@ const App = () => {
           });
 
           const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.5); // Adjust the threshold as needed
+          console.log(faceMatcher);
 
           let faceFound = false;
-
           resizedDetections.forEach((detection) => {
             const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
             const box = detection.detection.box;
             const { label, distance } = bestMatch;
+            console.log("label", label);
 
             if (label !== "unknown") {
               faceFound = true;
-
               // Draw the label and the box
               const drawBox = new faceapi.draw.DrawBox(box, {
                 label: `${label} (${distance.toFixed(2)})`,
@@ -141,10 +142,10 @@ const App = () => {
             height="560"
             className="border"
           />
-          {/* <canvas
+          <canvas
             ref={canvasRef}
             className="border border-blue-500 absolute top-0 left-0 w-full h-[540px]"
-          /> */}
+          />
         </div>
 
         <CustomTable
