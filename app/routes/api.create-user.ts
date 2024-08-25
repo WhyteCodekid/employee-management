@@ -9,7 +9,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export const action: ActionFunction = async ({ request }) => {
-  console.log("Adding face to the database");
   const facesFilePath = path.join(__dirname, "../app/assets", "faces.json");
 
   // Load existing faces or initialize an empty array

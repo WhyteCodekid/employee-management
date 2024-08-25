@@ -68,7 +68,6 @@ const App = () => {
           faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
 
           const labeledDescriptors = users.map((f) => {
-            console.log(f.user?._id);
             return new faceapi.LabeledFaceDescriptors(f.user?._id, [
               new Float32Array(f.descriptor),
             ]);
@@ -82,12 +81,9 @@ const App = () => {
             const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
             const box = detection.detection.box;
             const { label, distance } = bestMatch;
-            console.log({ bestMatch });
 
             if (label !== "unknown") {
               faceFound = true;
-              console.log({ label, distance });
-              console.log("Face found!");
 
               // Draw the label and the box
               const drawBox = new faceapi.draw.DrawBox(box, {

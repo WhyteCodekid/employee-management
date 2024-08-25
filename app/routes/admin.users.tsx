@@ -80,7 +80,6 @@ export default function AdminEmployeesManagement() {
         const descriptor = await getFaceDescriptor(image);
         if (descriptor) {
           setDescriptor(descriptor);
-          console.log(descriptor);
 
           // Send the face data to the server
           // fetch("/api/add-face", {

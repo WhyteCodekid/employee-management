@@ -22,7 +22,6 @@ export default function AdminLayout() {
 export const loader: LoaderFunction = async ({ request }) => {
   const adminControlle = new UserController(request);
   const user = await adminControlle.getUser();
-  console.log(user);
 
   return {};
 };

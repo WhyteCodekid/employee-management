@@ -203,7 +203,7 @@ export default class UserController {
       });
     }
 
-    return this.createUserSession(user.id, "/admin");
+    return this.createUserSession(user.id, `/${user.role}`);
   }
 
   public updateMyProfile = async ({

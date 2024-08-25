@@ -15,7 +15,7 @@ export default function AdminAttendanceManagement() {
   const { search_term, page, departments, attendance } =
     useLoaderData<typeof loader>();
   const navigate = useNavigate();
-  console.log(departments);
+  console.log({ attendance });
 
   return (
     <div className="flex flex-col">

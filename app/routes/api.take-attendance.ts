@@ -4,7 +4,6 @@ import Attendance from "~/models/Attendance";
 
 export const action: ActionFunction = async ({ request }) => {
   const payload = await request.json();
-  console.log(payload);
 
   const currentTime = new Date(payload.date);
   const oneHourInMilliseconds = 60 * 60 * 1000;
