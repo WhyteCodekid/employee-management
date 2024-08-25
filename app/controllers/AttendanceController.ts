@@ -191,103 +191,81 @@ export default class AttendanceController {
     }
   };
 
-  /**
-   * Update department
-   * @param param0 _id
-   * @param param1 name
-   * @param param2 parent
-   * @param param3 description
-   * @returns null
-   */
-  public updateAttendance = async ({
-    _id,
-    name,
-    parent,
-    description,
-    supervisors,
-    manager,
+  public todayAttendance = async ({
+    page,
+    search_term,
+    limit = 10,
   }: {
-    _id: string;
-    name: string;
-    parent: string;
-    description: string;
-    supervisors: string[];
-    manager: string;
+    page: number;
+    search_term?: string;
+    limit?: number;
   }) => {
-    const session = await getFlashSession(this.request.headers.get("Cookie"));
+    const skipCount = (page - 1) * limit;
+
+    const searchFilter = search_term
+      ? {
+          $or: [
+            {
+              name: {
+                $regex: new RegExp(
+                  search_term
+                    .split(" ")
+                    .map((term) => `(?=.*${term})`)
+                    .join(""),
+                  "i"
+                ),
+              },
+            },
+            {
+              description: {
+                $regex: new RegExp(
+                  search_term
+                    .split(" ")
+                    .map((term) => `(?=.*${term})`)
+                    .join(""),
+                  "i"
+                ),
+              },
+            },
+          ],
+        }
+      : {};
 
     try {
-      const updated = await Attendance.findByIdAndUpdate(
-        _id,
-        {
-          name,
-          parent,
-          description,
-          supervisors,
-          manager: manager || null,
-        },
-        { new: true }
+      const today = new Date();
+      const start = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate()
+      );
+      const end = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate() + 1
       );
 
-      session.flash("message", {
-        title: "Attendance updated successfully!",
-        status: "success",
-      });
-      return redirect("/admin/attendances", {
-        headers: {
-          "Set-Cookie": await commitFlashSession(session),
+      const attendance = await Attendance.find({
+        ...searchFilter,
+        chekInTime: {
+          $gte: start,
+          $lt: end,
         },
-      });
+      })
+        .populate("user")
+        .skip(skipCount)
+        .limit(limit)
+        .sort({
+          createdAt: "desc",
+        });
 
-      return {
-        status: "success",
-        code: 200,
-        message: "Attendance updated successfully",
-        data: updated,
-      };
+      const totalAttendancesCount = await Attendance.countDocuments(
+        searchFilter
+      ).exec();
+      const totalPages = Math.ceil(totalAttendancesCount / limit);
+
+      return { attendance, totalPages };
     } catch (error) {
-      session.flash("message", {
-        title: "Something went wrong!",
-        status: "error",
-      });
-      return redirect("/admin/attendances", {
-        headers: {
-          "Set-Cookie": await commitFlashSession(session),
-        },
-      });
-
-      return {
-        status: "error",
-        code: 400,
-        message: "Error updating department",
-      };
-    }
-  };
-
-  /**
-   * Delete Attendance
-   * @param param0 _id
-   * @returns null
-   */
-  public deleteAttendance = async ({ _id }: { _id: string }) => {
-    const session = await getFlashSession(this.request.headers.get("Cookie"));
-
-    try {
-      await Attendance.findByIdAndDelete(_id);
-
-      return {
-        status: "success",
-        code: 200,
-        message: "Attendance deleted successfully",
-      };
-    } catch (error) {
-      console.log(error);
-
-      return {
-        status: "error",
-        code: 400,
-        message: "Error deleting department",
-      };
+      console.error("Error retrieving today's attendance:", error);
     }
   };
 }
