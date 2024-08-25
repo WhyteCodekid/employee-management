@@ -8,9 +8,8 @@ import CustomTable from "~/components/ui/new-table";
 import { LoaderFunction } from "@remix-run/node";
 import DepartmentController from "~/controllers/DepartmentController";
 import axios from "axios";
-import UserController from "~/controllers/UserController";
-import User from "~/models/User";
 import Face from "~/models/Faces";
+import knownFaces from "~/assets/faces.json";
 
 const App = () => {
   const { search_term, page, departments, users } =
@@ -68,14 +67,14 @@ const App = () => {
           faceapi.draw.drawDetections(canvas, resizedDetections);
           faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
 
-          const labeledDescriptors = users.map(
-            (f) =>
-              new faceapi.LabeledFaceDescriptors(f.user?._id, [
-                new Float32Array(f.descriptor),
-              ])
-          );
+          const labeledDescriptors = users.map((f) => {
+            console.log(f.user?._id);
+            return new faceapi.LabeledFaceDescriptors(f.user?._id, [
+              new Float32Array(f.descriptor),
+            ]);
+          });
 
-          const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.81); // Adjust the threshold as needed
+          const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.5); // Adjust the threshold as needed
 
           let faceFound = false;
 
@@ -83,7 +82,7 @@ const App = () => {
             const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
             const box = detection.detection.box;
             const { label, distance } = bestMatch;
-            console.log({ label });
+            console.log({ bestMatch });
 
             if (label !== "unknown") {
               faceFound = true;
@@ -97,7 +96,7 @@ const App = () => {
               drawBox.draw(canvas);
 
               // make api request to take attendance
-              axios.post("/take-attendance", {
+              axios.post("/api/take-attendance", {
                 user: label,
               });
             }
@@ -146,10 +145,10 @@ const App = () => {
             height="560"
             className="border"
           />
-          <canvas
+          {/* <canvas
             ref={canvasRef}
             className="border border-blue-500 absolute top-0 left-0 w-full h-[540px]"
-          />
+          /> */}
         </div>
 
         <CustomTable

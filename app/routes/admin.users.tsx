@@ -135,6 +135,8 @@ export default function AdminEmployeesManagement() {
             type="number"
             isRequired
           />
+          <TextInput label="Password" name="password" type="text" isRequired />
+
           {processingImage && <p>Processing image...</p>}
           <ImageInputWithPreview
             name="image"

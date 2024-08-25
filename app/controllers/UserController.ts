@@ -342,6 +342,7 @@ export default class UserController {
     image,
     baseSalary,
     descriptor,
+    password,
   }: {
     firstName: string;
     lastName: string;
@@ -355,6 +356,7 @@ export default class UserController {
     image: string;
     baseSalary: number;
     descriptor: string;
+    password: string;
   }) => {
     const session = await getFlashSession(this.request.headers.get("Cookie"));
 
@@ -403,6 +405,7 @@ export default class UserController {
         position,
         image,
         baseSalary,
+        password,
       });
 
       const newFace = await Face.create({
