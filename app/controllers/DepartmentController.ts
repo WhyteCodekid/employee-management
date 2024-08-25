@@ -126,7 +126,7 @@ export default class DepartmentController {
     description,
   }: {
     name: string;
-    parent: string;
+    parent?: string;
     description: string;
   }) => {
     const session = await getFlashSession(this.request.headers.get("Cookie"));
@@ -208,10 +208,10 @@ export default class DepartmentController {
   }: {
     _id: string;
     name: string;
-    parent: string;
+    parent?: string;
     description: string;
-    supervisors: string[];
-    manager: string;
+    supervisors?: string[];
+    manager?: string;
   }) => {
     const session = await getFlashSession(this.request.headers.get("Cookie"));
 
