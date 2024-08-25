@@ -51,3 +51,11 @@ export type FaceInterface = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+export type FaqInterface = {
+  _id: string;
+  question: string;
+  answer: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
