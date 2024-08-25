@@ -16,7 +16,7 @@ const schema = new Schema<LeaveInterface>(
     },
     type: {
       type: String,
-      enum: ["annual", "sick", "unpaid"],
+      enum: ["annual", "sick", "unpaid", "maternity"],
       required: true,
     },
     startDate: {

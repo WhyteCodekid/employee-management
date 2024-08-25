@@ -2,7 +2,8 @@
 import {
   Button,
   Chip,
-  Input,
+  DatePicker,
+  SelectItem,
   TableCell,
   TableRow,
   useDisclosure,
@@ -19,6 +20,7 @@ import CustomTable from "~/components/ui/new-table";
 import { FaqInterface, LeaveInterface } from "~/utils/types";
 import TextareaInput from "~/components/inputs/textarea";
 import FaqController from "~/controllers/FaqController";
+import CustomSelect from "~/components/inputs/select";
 import LeaveController from "~/controllers/LeaveController";
 import moment from "moment";
 
@@ -27,7 +29,7 @@ export default function AdminEmployeesManagement() {
     message: string;
     status: "error" | "success";
   }>();
-  const { search_term, page, leaves, totalPages, status } =
+  const { search_term, page, leaves, totalPages } =
     useLoaderData<typeof loader>();
   const navigate = useNavigate();
 
@@ -54,29 +56,62 @@ export default function AdminEmployeesManagement() {
 
   return (
     <div>
-      <Header title="Employees Leave Management" />
+      <Header title="My Leave Applications" />
 
-      <div className="flex items-center justify-between py-4 px-4">
-        <Input
-          value={search_term}
-          onValueChange={(value) =>
-            navigate(`?search_term=${value || ""}&page=${page || ""}`)
-          }
-          variant="bordered"
-          placeholder="Search here..."
-          className="w-1/4"
-          classNames={{
-            inputWrapper: "bg-white dark:bg-transparent",
-          }}
-          color="success"
-          aria-labelledby="search input"
-        />
-      </div>
+      <SearchAndCreateRecordBar
+        buttonText="New Request"
+        modalTitle="New Leave Application Request"
+        searchValue={search_term}
+        pageValue={page}
+        formIntent="new-leave-request"
+        flashMessage={flashMessage}
+      >
+        <div className="flex flex-col gap-5">
+          <CustomSelect name="type" label="Leave Type">
+            {[
+              { label: "Sick leave", value: "sick" },
+              { label: "Maternity leave", value: "maternity" },
+              { label: "Annual leave", value: "annual" },
+              { label: "Unpaid leave", value: "unpaid" },
+            ].map((option) => (
+              <SelectItem key={option.value}>{option.label}</SelectItem>
+            ))}
+          </CustomSelect>
+          <DatePicker
+            variant="bordered"
+            color="success"
+            labelPlacement="outside"
+            className="font-quicksand"
+            dateInputClassNames={{
+              label:
+                "font-medium font-montserrat text-slate-800 dark:text-slate-100",
+            }}
+            label="Start Date"
+            name="startDate"
+          />
+          <DatePicker
+            variant="bordered"
+            color="success"
+            labelPlacement="outside"
+            className="font-quicksand"
+            classNames={{
+              label:
+                "font-medium font-montserrat text-slate-800 dark:text-slate-100",
+            }}
+            dateInputClassNames={{
+              label:
+                "font-medium font-montserrat text-slate-800 dark:text-slate-100",
+            }}
+            label="End Date"
+            name="endDate"
+          />
+          <TextareaInput label="Reason" name="reason" />
+        </div>
+      </SearchAndCreateRecordBar>
 
       <div className="px-4">
         <CustomTable
           columns={[
-            "Employee Name",
             "Type",
             "Start Date",
             "End Date",
@@ -92,10 +127,7 @@ export default function AdminEmployeesManagement() {
         >
           {leaves?.map((leave: LeaveInterface, index: number) => (
             <TableRow key={index}>
-              <TableCell>
-                {leave.user.firstName} {leave.user.lastName}
-              </TableCell>
-              <TableCell>{leave.type}</TableCell>
+              <TableCell className="capitalize">{leave.type} leave</TableCell>
               <TableCell>
                 {moment(leave.startDate).format("DD/MM/YYYY")}
               </TableCell>
@@ -103,7 +135,6 @@ export default function AdminEmployeesManagement() {
                 {moment(leave.endDate).format("DD/MM/YYYY")}
               </TableCell>
               <TableCell>
-                {" "}
                 <Chip
                   size="sm"
                   className="font-quicksand font-semibold capitalize"
@@ -210,10 +241,14 @@ export const action: ActionFunction = async ({ request }) => {
   const formValues = Object.fromEntries(formData.entries());
 
   const faqController = new FaqController(request);
-  if (formValues.intent === "create-faq") {
-    return faqController.createFaq({
-      question: formValues.question as string,
-      answer: formValues.answer as string,
+  const leaveController = new LeaveController(request);
+
+  if (formValues.intent === "new-leave-request") {
+    return await leaveController.requestLeave({
+      type: formValues.type as string,
+      startDate: formValues.startDate as string,
+      endDate: formValues.endDate as string,
+      reason: formValues.reason as string,
     });
   }
   if (formValues.intent === "update-faq") {
@@ -232,12 +267,11 @@ export const action: ActionFunction = async ({ request }) => {
 
 export const loader: LoaderFunction = async ({ request }) => {
   const url = new URL(request.url);
-  const search_term = url.searchParams.get("search_term") || "";
   const status = url.searchParams.get("status") || "";
+  const search_term = url.searchParams.get("search_term") || "";
   const page = parseInt(url.searchParams.get("page") || "1");
 
   const leaveController = new LeaveController(request);
-
   const { leaves, totalPages } = await leaveController.getLeaves({
     page,
     search_term,
@@ -245,11 +279,12 @@ export const loader: LoaderFunction = async ({ request }) => {
     status,
   });
 
+  console.log(leaves);
+
   return {
     search_term,
     page,
     leaves,
-    status,
     totalPages,
   };
 };

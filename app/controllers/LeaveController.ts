@@ -62,6 +62,7 @@ export default class LeaveController {
       };
 
       const leaves = await Leave.find(searchFilter)
+        .populate("user")
         .skip(skipCount)
         .limit(limit)
         .sort({
