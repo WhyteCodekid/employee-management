@@ -13,13 +13,16 @@ export type UserInterface = {
   updatedAt: Date;
 };
 
-export type EmailHistoryInterface = {
+export type LeaveInterface = {
   _id: string;
-  from: string;
-  to: string;
-  subject: string;
-  body: string;
-  storeName: string;
+  user: UserInterface;
+  status: string;
+  type: string;
+  startDate: Date;
+  endDate: Date;
+  reason: string;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export type SettingsInterface = {

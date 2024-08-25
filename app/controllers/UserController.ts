@@ -206,7 +206,7 @@ export default class UserController {
     return this.createUserSession(user.id, "/admin");
   }
 
-  public updateProfile = async ({
+  public updateMyProfile = async ({
     firstName,
     lastName,
     email,
@@ -593,9 +593,7 @@ export default class UserController {
     role,
     department,
     phone,
-
     dateOfBirth,
-    permissions,
     position,
     baseSalary,
   }: {
@@ -606,9 +604,7 @@ export default class UserController {
     role: string;
     department: string;
     phone: string;
-
     dateOfBirth: string;
-    permissions: string[];
     position: string;
     baseSalary: number;
   }) => {
@@ -665,7 +661,6 @@ export default class UserController {
           department,
           phone,
           dateOfBirth,
-          permissions,
           position,
           baseSalary,
         },

@@ -57,18 +57,6 @@ const userSchema = new Schema<UserInterface>(
       type: String,
       required: false,
     },
-    permissions: [
-      {
-        type: String,
-      },
-    ],
-    generalManager: {
-      type: Boolean,
-      default: false,
-    },
-    contractor: {
-      type: String,
-    },
     employeeStatus: {
       type: String,
       enum: ["active", "inactive"],
