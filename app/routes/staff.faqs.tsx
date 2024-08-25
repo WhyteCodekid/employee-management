@@ -1,5 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Button, TableCell, TableRow, useDisclosure } from "@nextui-org/react";
+import {
+  Accordion,
+  AccordionItem,
+  Button,
+  Input,
+  TableCell,
+  TableRow,
+  useDisclosure,
+} from "@nextui-org/react";
 import { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { useLoaderData, useNavigate, useOutletContext } from "@remix-run/react";
 import { useEffect, useState } from "react";
@@ -45,62 +53,39 @@ export default function AdminEmployeesManagement() {
 
   return (
     <div>
-      <Header title="Manage Frequently Asked Questions" />
+      <Header title="Frequently Asked Questions" />
 
-      <SearchAndCreateRecordBar
-        buttonText="New FAQ"
-        modalTitle="Add New Frequently Asked Question"
-        searchValue={search_term}
-        pageValue={page}
-        formIntent="create-faq"
-        flashMessage={flashMessage}
-      >
-        <div className="flex flex-col gap-5">
-          <TextInput label="Question" name="question" isRequired />
-          <TextareaInput label="Answer" name="answer" isRequired />
-        </div>
-      </SearchAndCreateRecordBar>
+      <div className="flex items-center justify-between py-4 px-4">
+        <Input
+          value={search_term}
+          onValueChange={(value) =>
+            navigate(`?search_term=${value || ""}&page=${page || ""}`)
+          }
+          variant="bordered"
+          placeholder="Search here..."
+          className="w-1/4"
+          classNames={{
+            inputWrapper: "bg-white dark:bg-transparent",
+          }}
+          color="success"
+          aria-labelledby="search input"
+        />
+      </div>
 
       <div className="px-4">
-        <CustomTable
-          columns={["Question", "Answer", "Actions"]}
-          page={page}
-          setPage={(page) =>
-            navigate(`?page=${page}&search_term=${search_term}`)
-          }
-          totalPages={totalPages}
-        >
-          {faqs?.map((faq: FaqInterface, index: number) => (
-            <TableRow key={index}>
-              <TableCell>{faq.question}</TableCell>
-              <TableCell>{faq.answer}</TableCell>
-              <TableCell className="flex items-center gap-2">
-                <Button
-                  variant="flat"
-                  color="primary"
-                  size="sm"
-                  onPress={() => {
-                    setFaq(faq);
-                    editDisclosure.onOpen();
-                  }}
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant="flat"
-                  color="danger"
-                  size="sm"
-                  onPress={() => {
-                    setFaqId(faq._id);
-                    deleteDisclosure.onOpen();
-                  }}
-                >
-                  Delete
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </CustomTable>
+        <div className="md:!h-[85vh] h-[65vh] overflow-y-auto w-screen md:w-full overflow-x-auto  shadow-none rounded-2xl dark:border border-white/5 vertical-scrollbar horizontal-scrollbar p-4">
+          <Accordion variant="splitted">
+            {faqs?.map((faq: FaqInterface, index: number) => (
+              <AccordionItem
+                key={`faq ${index}`}
+                aria-label="Accordion 1"
+                title={faq.question}
+              >
+                {faq.answer}
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
       </div>
 
       {/* edit user modal */}
@@ -195,6 +180,8 @@ export const loader: LoaderFunction = async ({ request }) => {
     search_term,
     limit: 15,
   });
+
+  console.log(faqs);
 
   return {
     search_term,

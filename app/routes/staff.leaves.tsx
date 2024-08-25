@@ -160,6 +160,7 @@ export default function AdminEmployeesManagement() {
                     setFaq(faq);
                     editDisclosure.onOpen();
                   }}
+                  isDisabled={leave.status !== "pending"}
                 >
                   Edit
                 </Button>
@@ -171,6 +172,7 @@ export default function AdminEmployeesManagement() {
                     setFaqId(faq._id);
                     deleteDisclosure.onOpen();
                   }}
+                  isDisabled={leave.status !== "pending"}
                 >
                   Delete
                 </Button>
