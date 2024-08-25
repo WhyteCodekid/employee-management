@@ -1,26 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  Button,
-  Chip,
-  SelectItem,
-  TableCell,
-  TableRow,
-  useDisclosure,
-} from "@nextui-org/react";
+import { Button, TableCell, TableRow, useDisclosure } from "@nextui-org/react";
 import { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { useLoaderData, useNavigate, useOutletContext } from "@remix-run/react";
 import { useEffect, useState } from "react";
-import { ImageInputWithPreview } from "~/components/inputs/image";
-import CustomSelect from "~/components/inputs/select";
 import TextInput from "~/components/inputs/text-input";
 import DeleteRecordModal from "~/components/modals/DeleteRecord";
 import EditRecordModal from "~/components/modals/EditRecord";
 import SearchAndCreateRecordBar from "~/components/sections/search-create-bar";
 import Header from "~/components/ui/header";
 import CustomTable from "~/components/ui/new-table";
-import UserController from "~/controllers/UserController";
-import { FaqInterface, UserInterface } from "~/utils/types";
-import * as faceapi from "face-api.js";
+import { FaqInterface } from "~/utils/types";
 import TextareaInput from "~/components/inputs/textarea";
 import FaqController from "~/controllers/FaqController";
 
@@ -174,7 +163,6 @@ export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
   const formValues = Object.fromEntries(formData.entries());
 
-  const userController = new UserController(request);
   const faqController = new FaqController(request);
   if (formValues.intent === "create-faq") {
     return faqController.createFaq({
