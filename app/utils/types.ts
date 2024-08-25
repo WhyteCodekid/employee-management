@@ -17,7 +17,7 @@ export type LeaveInterface = {
   _id: string;
   user: UserInterface;
   status: string;
-  type: string;
+  type: "sick" | "annual" | "unpaid" | undefined;
   startDate: Date;
   endDate: Date;
   reason: string;
