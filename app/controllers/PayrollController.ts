@@ -1,9 +1,9 @@
 import { redirect } from "@remix-run/node";
 import { commitFlashSession, getFlashSession } from "~/utils/flash-session";
-import Faq from "~/models/Faq";
+import DeductionBonus from "~/models/DeductionBonus";
 import { FaqInterface } from "~/utils/types";
 
-export default class FaqController {
+export default class PayrollController {
   private request: Request;
   private path: string;
 
@@ -16,13 +16,13 @@ export default class FaqController {
   }
 
   /**
-   * Retrieve all Faq
+   * Retrieve all DeductionBonus
    * @param param0 page
    * @param param1 search_term
    * @param param2 limit
    * @returns {faqs: FaqInterface, totalPages: number}
    */
-  public async getFaqs({
+  public async getDeductionBonuses({
     page,
     search_term,
     limit = 10,
@@ -34,47 +34,40 @@ export default class FaqController {
     const session = await getFlashSession(this.request.headers.get("Cookie"));
     try {
       const skipCount = (page - 1) * limit;
+      const regex = new RegExp(
+        search_term ||
+          ""
+            .split(" ")
+            .map((term) => `(?=.*${term})`)
+            .join(""),
+        "i"
+      );
 
       const searchFilter = search_term
         ? {
             $or: [
               {
-                question: {
-                  $regex: new RegExp(
-                    search_term
-                      .split(" ")
-                      .map((term) => `(?=.*${term})`)
-                      .join(""),
-                    "i"
-                  ),
-                },
+                question: { $regex: regex },
               },
               {
-                answer: {
-                  $regex: new RegExp(
-                    search_term
-                      .split(" ")
-                      .map((term) => `(?=.*${term})`)
-                      .join(""),
-                    "i"
-                  ),
-                },
+                answer: { $regex: regex },
               },
             ],
           }
         : {};
 
-      const faqs = await Faq.find(searchFilter)
-        .skip(skipCount)
-        .limit(limit)
-        .sort({
-          createdAt: "desc",
-        })
-        .exec();
+      const [faqs, totalDeductionBonusesCount] = await Promise.all([
+        DeductionBonus.find(searchFilter)
+          .skip(skipCount)
+          .limit(limit)
+          .sort({
+            createdAt: "desc",
+          })
+          .exec(),
+        DeductionBonus.countDocuments(searchFilter).exec(),
+      ]);
 
-      const totalFaqsCount = await Faq.countDocuments(searchFilter).exec();
-      const totalPages = Math.ceil(totalFaqsCount / limit);
-
+      const totalPages = Math.ceil(totalDeductionBonusesCount / limit);
       return { faqs, totalPages };
     } catch (error) {
       console.log(error);
@@ -93,13 +86,13 @@ export default class FaqController {
   }
 
   /**
-   * Retrieve a single Faq
+   * Retrieve a single DeductionBonus
    * @param id string
    * @returns FaqInterface
    */
   public async getFaq(id: string): Promise<FaqInterface | null> {
     try {
-      const faq = await Faq.findById(id);
+      const faq = await DeductionBonus.findById(id);
       return faq;
     } catch (error) {
       console.error("Error retrieving faq:", error);
@@ -123,13 +116,13 @@ export default class FaqController {
     const session = await getFlashSession(this.request.headers.get("Cookie"));
 
     try {
-      const existingFaq = await Faq.findOne({ question });
+      const existingFaq = await DeductionBonus.findOne({ question });
 
       if (existingFaq) {
         return {
           status: "error",
           code: 400,
-          message: "Faq already exists",
+          message: "DeductionBonus already exists",
           errors: [
             {
               field: "question",
@@ -140,13 +133,13 @@ export default class FaqController {
         };
       }
 
-      const faq = await Faq.create({
+      const faq = await DeductionBonus.create({
         question,
         answer,
       });
 
       session.flash("message", {
-        title: "Faq created!",
+        title: "DeductionBonus created!",
         status: "success",
       });
       return redirect("/admin/faqs", {
@@ -188,7 +181,7 @@ export default class FaqController {
     const session = await getFlashSession(this.request.headers.get("Cookie"));
 
     try {
-      const updated = await Faq.findByIdAndUpdate(
+      const updated = await DeductionBonus.findByIdAndUpdate(
         id,
         {
           question,
@@ -198,7 +191,7 @@ export default class FaqController {
       );
 
       session.flash("message", {
-        title: "Faq updated successfully!",
+        title: "DeductionBonus updated successfully!",
         status: "success",
       });
       return redirect("/admin/faqs", {
@@ -220,7 +213,7 @@ export default class FaqController {
   };
 
   /**
-   * Delete Faq
+   * Delete DeductionBonus
    * @param param0 _id
    * @returns null
    */
@@ -228,12 +221,12 @@ export default class FaqController {
     const session = await getFlashSession(this.request.headers.get("Cookie"));
 
     try {
-      await Faq.findByIdAndDelete(id);
+      await DeductionBonus.findByIdAndDelete(id);
 
       session.flash("message", {
         title: "Success!",
         status: "success",
-        description: "Faq deleted successfully",
+        description: "DeductionBonus deleted successfully",
       });
       return redirect("/admin/faqs", {
         headers: {
