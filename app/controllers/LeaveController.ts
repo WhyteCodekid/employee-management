@@ -89,6 +89,30 @@ export default class LeaveController {
     }
   }
 
+  public getMyLeaves = async () => {
+    const session = await getFlashSession(this.request.headers.get("Cookie"));
+
+    try {
+      const userController = new UserController(this.request);
+
+      const userId = await userController.getUserId();
+
+      const leaves = await Leave.find({ user: userId });
+
+      return leaves;
+    } catch (error) {
+      session.flash("message", {
+        title: "Something went wrong!",
+        status: "error",
+      });
+      return redirect("/admin/faqs", {
+        headers: {
+          "Set-Cookie": await commitFlashSession(session),
+        },
+      });
+    }
+  };
+
   /**
    * Retrieve a single Leave
    * @param id string
@@ -100,6 +124,7 @@ export default class LeaveController {
       return faq;
     } catch (error) {
       console.error("Error retrieving faq:", error);
+      return null;
     }
   }
 
