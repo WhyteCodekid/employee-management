@@ -22,13 +22,14 @@ import UserController from "~/controllers/UserController";
 import { UserInterface } from "~/utils/types";
 import * as faceapi from "face-api.js";
 import TextareaInput from "~/components/inputs/textarea";
+import FaqController from "~/controllers/FaqController";
 
 export default function AdminEmployeesManagement() {
   const flashMessage = useOutletContext<{
     message: string;
     status: "error" | "success";
   }>();
-  const { search_term, page, users, totalPages } =
+  const { search_term, page, faqs, totalPages } =
     useLoaderData<typeof loader>();
   const navigate = useNavigate();
 
@@ -79,7 +80,7 @@ export default function AdminEmployeesManagement() {
           }
           totalPages={totalPages}
         >
-          {users?.map((employee: UserInterface, index: number) => (
+          {faqs?.map((employee: UserInterface, index: number) => (
             <TableRow key={index}>
               <TableCell>{employee.email}</TableCell>
               <TableCell>{employee.phone}</TableCell>
@@ -190,8 +191,12 @@ export const action: ActionFunction = async ({ request }) => {
   const formValues = Object.fromEntries(formData.entries());
 
   const userController = new UserController(request);
-  if (formValues.intent === "create-employee") {
-    return userController.createUser(formValues);
+  const faqController = new FaqController(request);
+  if (formValues.intent === "create-faq") {
+    return faqController.createFaq({
+      question: formValues.question as string,
+      answer: formValues.answer as string,
+    });
   }
   if (formValues.intent === "delete") {
     return userController.deleteUser({ userId: formValues.id });
@@ -205,8 +210,8 @@ export const loader: LoaderFunction = async ({ request }) => {
   const search_term = url.searchParams.get("search_term") || "";
   const page = parseInt(url.searchParams.get("page") || "1");
 
-  const userController = new UserController(request);
-  const { users, totalPages } = await userController.getUsers({
+  const faqController = new FaqController(request);
+  const { faqs, totalPages } = await faqController.getFaqs({
     page,
     search_term,
     limit: 15,
@@ -215,7 +220,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   return {
     search_term,
     page,
-    users,
+    faqs,
     totalPages,
   };
 };
