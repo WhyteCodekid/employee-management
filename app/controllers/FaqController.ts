@@ -122,7 +122,7 @@ export default class FaqController {
     const session = await getFlashSession(this.request.headers.get("Cookie"));
 
     try {
-      const existingFaq = await Faq.findOne({ name });
+      const existingFaq = await Faq.findOne({ question });
 
       if (existingFaq) {
         return {
@@ -131,9 +131,9 @@ export default class FaqController {
           message: "Faq already exists",
           errors: [
             {
-              field: "name",
+              field: "question",
               message:
-                "A faq with this name already exists. Please choose a different name.",
+                "A faq with this question already exists. Please choose a different question.",
             },
           ],
         };
