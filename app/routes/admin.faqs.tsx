@@ -19,7 +19,7 @@ import SearchAndCreateRecordBar from "~/components/sections/search-create-bar";
 import Header from "~/components/ui/header";
 import CustomTable from "~/components/ui/new-table";
 import UserController from "~/controllers/UserController";
-import { UserInterface } from "~/utils/types";
+import { FaqInterface, UserInterface } from "~/utils/types";
 import * as faceapi from "face-api.js";
 import TextareaInput from "~/components/inputs/textarea";
 import FaqController from "~/controllers/FaqController";
@@ -35,21 +35,22 @@ export default function AdminEmployeesManagement() {
 
   // delete user stuff
   const deleteDisclosure = useDisclosure();
-  const [userId, setUserId] = useState("");
+  const [faqId, setFaqId] = useState("");
 
   // edit user stuff
   const editDisclosure = useDisclosure();
-  const [userData, setUserData] = useState<UserInterface | null>(null);
+  const [faq, setFaq] = useState<FaqInterface | null>(null);
   useEffect(() => {
     if (!editDisclosure.isOpen) {
-      setUserData(null);
+      setFaq(null);
     }
   }, [editDisclosure.onOpenChange]);
 
   useEffect(() => {
     if (flashMessage && flashMessage.status === "success") {
-      setUserId("");
+      setFaqId("");
       deleteDisclosure.onClose();
+      editDisclosure.onClose();
     }
   }, [flashMessage]);
 
@@ -80,17 +81,17 @@ export default function AdminEmployeesManagement() {
           }
           totalPages={totalPages}
         >
-          {faqs?.map((employee: UserInterface, index: number) => (
+          {faqs?.map((faq: FaqInterface, index: number) => (
             <TableRow key={index}>
-              <TableCell>{employee.email}</TableCell>
-              <TableCell>{employee.phone}</TableCell>
+              <TableCell>{faq.question}</TableCell>
+              <TableCell>{faq.answer}</TableCell>
               <TableCell className="flex items-center gap-2">
                 <Button
                   variant="flat"
                   color="primary"
                   size="sm"
                   onPress={() => {
-                    setUserData(employee);
+                    setFaq(faq);
                     editDisclosure.onOpen();
                   }}
                 >
@@ -101,7 +102,7 @@ export default function AdminEmployeesManagement() {
                   color="danger"
                   size="sm"
                   onPress={() => {
-                    setUserId(employee._id);
+                    setFaqId(faq._id);
                     deleteDisclosure.onOpen();
                   }}
                 >
@@ -117,56 +118,38 @@ export default function AdminEmployeesManagement() {
       <EditRecordModal
         isModalOpen={editDisclosure.isOpen}
         onCloseModal={editDisclosure.onClose}
-        title="Update User Account"
-        intent="update-user"
+        title="Update Frequently Asked Question"
+        intent="update-faq"
         size="lg"
       >
         <div className="flex flex-col gap-5">
           <TextInput
-            label="User ID"
+            label="Faq ID"
             name="id"
-            value={userData?._id}
+            value={faq?._id}
             className="hidden"
           />
           <TextInput
-            label="First Name"
-            name="firstName"
-            value={userData?.firstName}
+            label="Question"
+            name="question"
+            value={faq?.question}
+            onValueChange={(value) =>
+              setFaq((prev: any) => ({
+                ...prev,
+                question: value as string,
+              }))
+            }
           />
-          <TextInput
-            label="Last Name"
-            name="lastName"
-            value={userData?.lastName}
-          />
-          <TextInput
-            label="Email"
-            name="email"
-            type="email"
-            value={userData?.email}
-          />
-          <TextInput
-            label="Phone"
-            name="phone"
-            type="tel"
-            value={userData?.phone}
-          />
-          <CustomSelect
-            selectedKeys={[userData?.role as string]}
-            name="role"
-            label="Employee Role"
-          >
-            <SelectItem className="font-quicksand" key={"admin"}>
-              Administrator
-            </SelectItem>
-            <SelectItem className="font-quicksand" key={"staff"}>
-              Staff
-            </SelectItem>
-          </CustomSelect>
-          <TextInput
-            label="Base Salary"
-            name="baseSalary"
-            type="number"
-            isRequired
+          <TextareaInput
+            label="Answer"
+            name="answer"
+            value={faq?.answer}
+            onValueChange={(value) =>
+              setFaq((prev: any) => ({
+                ...prev,
+                answer: value as string,
+              }))
+            }
           />
         </div>
       </EditRecordModal>
@@ -175,12 +158,13 @@ export default function AdminEmployeesManagement() {
       <DeleteRecordModal
         isModalOpen={deleteDisclosure.isOpen}
         onCloseModal={deleteDisclosure.onClose}
-        title="Delete Employee Account"
+        title="Delete Frequently Asked Question"
       >
         <p className="font-quicksand">
-          Are you sure to delete this employee? This action cannot be undone...
+          Are you sure to delete this frequently asked question? This action
+          cannot be undone...
         </p>
-        <TextInput name="id" value={userId} className="hidden" />
+        <TextInput name="id" value={faqId} className="hidden" />
       </DeleteRecordModal>
     </div>
   );
@@ -198,8 +182,15 @@ export const action: ActionFunction = async ({ request }) => {
       answer: formValues.answer as string,
     });
   }
+  if (formValues.intent === "update-faq") {
+    return faqController.updateFaq({
+      id: formValues.id as string,
+      question: formValues.question as string,
+      answer: formValues.answer as string,
+    });
+  }
   if (formValues.intent === "delete") {
-    return userController.deleteUser({ userId: formValues.id });
+    return faqController.deleteFaq({ id: formValues.id as string });
   }
 
   return null;
