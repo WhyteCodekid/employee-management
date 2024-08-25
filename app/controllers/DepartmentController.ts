@@ -237,13 +237,6 @@ export default class DepartmentController {
           "Set-Cookie": await commitFlashSession(session),
         },
       });
-
-      return {
-        status: "success",
-        code: 200,
-        message: "Department updated successfully",
-        data: updated,
-      };
     } catch (error) {
       session.flash("message", {
         title: "Something went wrong!",
@@ -254,12 +247,6 @@ export default class DepartmentController {
           "Set-Cookie": await commitFlashSession(session),
         },
       });
-
-      return {
-        status: "error",
-        code: 400,
-        message: "Error updating department",
-      };
     }
   };
 
@@ -274,19 +261,27 @@ export default class DepartmentController {
     try {
       await Department.findByIdAndDelete(_id);
 
-      return {
+      session.flash("message", {
+        title: "Department deleted successfully!",
         status: "success",
-        code: 200,
-        message: "Department deleted successfully",
-      };
+      });
+      return redirect("/admin/departments", {
+        headers: {
+          "Set-Cookie": await commitFlashSession(session),
+        },
+      });
     } catch (error) {
       console.log(error);
 
-      return {
+      session.flash("message", {
+        title: "Something went wrong!",
         status: "error",
-        code: 400,
-        message: "Error deleting department",
-      };
+      });
+      return redirect("/admin/departments", {
+        headers: {
+          "Set-Cookie": await commitFlashSession(session),
+        },
+      });
     }
   };
 }

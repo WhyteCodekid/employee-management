@@ -1,7 +1,7 @@
 import { redirect } from "@remix-run/node";
 import { commitFlashSession, getFlashSession } from "~/utils/flash-session";
 import DeductionBonus from "~/models/DeductionBonus";
-import { FaqInterface } from "~/utils/types";
+import { DeductionBonusInterface } from "~/utils/types";
 
 export default class PayrollController {
   private request: Request;
@@ -20,7 +20,7 @@ export default class PayrollController {
    * @param param0 page
    * @param param1 search_term
    * @param param2 limit
-   * @returns {faqs: FaqInterface, totalPages: number}
+   * @returns {faqs: DeductionBonusInterface, totalPages: number}
    */
   public async getDeductionBonuses({
     page,
@@ -30,7 +30,7 @@ export default class PayrollController {
     page: number;
     search_term?: string;
     limit?: number;
-  }): Promise<{ faqs: FaqInterface[]; totalPages: number } | any> {
+  }): Promise<{ faqs: DeductionBonusInterface[]; totalPages: number } | any> {
     const session = await getFlashSession(this.request.headers.get("Cookie"));
     try {
       const skipCount = (page - 1) * limit;
@@ -88,9 +88,11 @@ export default class PayrollController {
   /**
    * Retrieve a single DeductionBonus
    * @param id string
-   * @returns FaqInterface
+   * @returns DeductionBonusInterface
    */
-  public async getFaq(id: string): Promise<FaqInterface | null> {
+  public async getDeductionBonus(
+    id: string
+  ): Promise<DeductionBonusInterface | null> {
     try {
       const faq = await DeductionBonus.findById(id);
       return faq;
@@ -104,9 +106,9 @@ export default class PayrollController {
    * Create a new faq
    * @param question string
    * @param answer string
-   * @returns FaqInterface
+   * @returns DeductionBonusInterface
    */
-  public createFaq = async ({
+  public createDeductionBonus = async ({
     question,
     answer,
   }: {
@@ -116,9 +118,9 @@ export default class PayrollController {
     const session = await getFlashSession(this.request.headers.get("Cookie"));
 
     try {
-      const existingFaq = await DeductionBonus.findOne({ question });
+      const existingDeductionBonus = await DeductionBonus.findOne({ question });
 
-      if (existingFaq) {
+      if (existingDeductionBonus) {
         return {
           status: "error",
           code: 400,
@@ -169,7 +171,7 @@ export default class PayrollController {
    * @param param3 description
    * @returns null
    */
-  public updateFaq = async ({
+  public updateDeductionBonus = async ({
     id,
     question,
     answer,
@@ -217,7 +219,7 @@ export default class PayrollController {
    * @param param0 _id
    * @returns null
    */
-  public deleteFaq = async ({ id }: { id: string }) => {
+  public deleteDeductionBonus = async ({ id }: { id: string }) => {
     const session = await getFlashSession(this.request.headers.get("Cookie"));
 
     try {
