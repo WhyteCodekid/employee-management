@@ -16,56 +16,52 @@ export default class LeaveController {
     this.path = path;
   }
 
-  /**
-   * Retrieve all Leave
-   * @param param0 page
-   * @param param1 search_term
-   * @param param2 limit
-   * @returns {faqs: LeaveInterface, totalPages: number}
-   */
   public async getLeaves({
     page,
     search_term,
     limit = 10,
+    status,
   }: {
     page: number;
     search_term?: string;
     limit?: number;
-  }): Promise<{ faqs: LeaveInterface[]; totalPages: number } | any> {
+    status: string;
+  }): Promise<{ leaves: LeaveInterface[]; totalPages: number } | any> {
     const session = await getFlashSession(this.request.headers.get("Cookie"));
     try {
       const skipCount = (page - 1) * limit;
 
-      const searchFilter = search_term
-        ? {
-            $or: [
-              {
-                question: {
-                  $regex: new RegExp(
-                    search_term
-                      .split(" ")
-                      .map((term) => `(?=.*${term})`)
-                      .join(""),
-                    "i"
-                  ),
-                },
+      const searchFilter = {
+        ...(search_term && {
+          $or: [
+            {
+              question: {
+                $regex: new RegExp(
+                  search_term
+                    .split(" ")
+                    .map((term) => `(?=.*${term})`)
+                    .join(""),
+                  "i"
+                ),
               },
-              {
-                answer: {
-                  $regex: new RegExp(
-                    search_term
-                      .split(" ")
-                      .map((term) => `(?=.*${term})`)
-                      .join(""),
-                    "i"
-                  ),
-                },
+            },
+            {
+              answer: {
+                $regex: new RegExp(
+                  search_term
+                    .split(" ")
+                    .map((term) => `(?=.*${term})`)
+                    .join(""),
+                  "i"
+                ),
               },
-            ],
-          }
-        : {};
+            },
+          ],
+        }),
+        ...(status && { status }),
+      };
 
-      const faqs = await Leave.find(searchFilter)
+      const leaves = await Leave.find(searchFilter)
         .skip(skipCount)
         .limit(limit)
         .sort({
@@ -76,13 +72,13 @@ export default class LeaveController {
       const totalLeavesCount = await Leave.countDocuments(searchFilter).exec();
       const totalPages = Math.ceil(totalLeavesCount / limit);
 
-      return { faqs, totalPages };
+      return { leaves, totalPages };
     } catch (error) {
       console.log(error);
       session.flash("message", {
         title: "Error!",
         status: "error",
-        description: "Error retrieving faqs",
+        description: "Error retrieving leaves",
       });
 
       return redirect(this.path, {
@@ -234,6 +230,46 @@ export default class LeaveController {
         status: "error",
       });
       return redirect("/admin/faqs", {
+        headers: {
+          "Set-Cookie": await commitFlashSession(session),
+        },
+      });
+    }
+  };
+
+  public changeStatus = async ({
+    id,
+    status,
+  }: {
+    id: string;
+    status: string;
+  }) => {
+    const session = await getFlashSession(this.request.headers.get("Cookie"));
+
+    try {
+      await Leave.findByIdAndUpdate(id, {
+        status,
+      });
+
+      session.flash("message", {
+        title: "Status changes",
+        status: "success",
+        description: "Error retrieving faqs",
+      });
+
+      return redirect(this.path, {
+        headers: {
+          "Set-Cookie": await commitFlashSession(session),
+        },
+      });
+    } catch (error) {
+      session.flash("message", {
+        title: "Error!",
+        status: "error",
+        description: "Error retrieving faqs",
+      });
+
+      return redirect(this.path, {
         headers: {
           "Set-Cookie": await commitFlashSession(session),
         },

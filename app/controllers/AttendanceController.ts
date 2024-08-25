@@ -206,7 +206,7 @@ export default class AttendanceController {
       ? {
           $or: [
             {
-              name: {
+              "user.name": {
                 $regex: new RegExp(
                   search_term
                     .split(" ")
@@ -246,7 +246,7 @@ export default class AttendanceController {
 
       const attendance = await Attendance.find({
         ...searchFilter,
-        chekInTime: {
+        checkInTime: {
           $gte: start,
           $lt: end,
         },
@@ -258,9 +258,14 @@ export default class AttendanceController {
           createdAt: "desc",
         });
 
-      const totalAttendancesCount = await Attendance.countDocuments(
-        searchFilter
-      ).exec();
+      const totalAttendancesCount = await Attendance.countDocuments({
+        ...searchFilter,
+        checkInTime: {
+          $gte: start,
+          $lt: end,
+        },
+      }).exec();
+
       const totalPages = Math.ceil(totalAttendancesCount / limit);
 
       return { attendance, totalPages };

@@ -9,11 +9,12 @@ const schema = new Schema<AttendanceInterface>(
       ref: "users",
       required: true,
     },
-    chekInTime: {
-      type: String,
+    checkInTime: {
+      type: Schema.Types.Date,
+      default: Date.now,
     },
-    chekOutTime: {
-      type: String,
+    checkOutTime: {
+      type: Schema.Types.Date,
     },
   },
   {

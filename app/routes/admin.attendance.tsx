@@ -4,6 +4,7 @@ import { useLoaderData, useNavigate, useOutletContext } from "@remix-run/react";
 import SearchAndCreateRecordBar from "~/components/sections/search-create-bar";
 import Header from "~/components/ui/header";
 import CustomTable from "~/components/ui/new-table";
+import AttendanceController from "~/controllers/AttendanceController";
 import DepartmentController from "~/controllers/DepartmentController";
 
 export default function AdminAttendanceManagement() {
@@ -11,7 +12,8 @@ export default function AdminAttendanceManagement() {
     message: string;
     status: "error" | "success";
   }>();
-  const { search_term, page, departments } = useLoaderData<typeof loader>();
+  const { search_term, page, departments, attendance } =
+    useLoaderData<typeof loader>();
   const navigate = useNavigate();
   console.log(departments);
 
@@ -51,7 +53,7 @@ export default function AdminAttendanceManagement() {
           }
           totalPages={1}
         >
-          {departments?.map(
+          {attendance?.map(
             (
               department: { name: string; description: string },
               index: number
@@ -96,10 +98,17 @@ export const loader: LoaderFunction = async ({ request }) => {
     }
   );
 
+  const attendanceController = await new AttendanceController(request);
+  const { attendance } = await attendanceController.todayAttendance({
+    page,
+    search_term,
+  });
+
   return {
     search_term,
     page,
     departments,
     totalPages,
+    attendance,
   };
 };
