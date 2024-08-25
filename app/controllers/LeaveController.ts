@@ -89,15 +89,55 @@ export default class LeaveController {
     }
   }
 
-  public getMyLeaves = async ({ page, limit = 10 }) => {
+  public getMyLeaves = async ({
+    page,
+    search_term,
+    limit = 10,
+    status,
+  }: {
+    page: number;
+    search_term?: string;
+    limit?: number;
+    status: string;
+  }) => {
     const session = await getFlashSession(this.request.headers.get("Cookie"));
     const skipCount = (page - 1) * limit;
     try {
       const userController = new UserController(this.request);
-
       const userId = await userController.getUserId();
 
-      const leaves = await Leave.find({ user: userId })
+      const searchFilter = {
+        ...(search_term && {
+          $or: [
+            {
+              question: {
+                $regex: new RegExp(
+                  search_term
+                    .split(" ")
+                    .map((term) => `(?=.*${term})`)
+                    .join(""),
+                  "i"
+                ),
+              },
+            },
+            {
+              answer: {
+                $regex: new RegExp(
+                  search_term
+                    .split(" ")
+                    .map((term) => `(?=.*${term})`)
+                    .join(""),
+                  "i"
+                ),
+              },
+            },
+          ],
+        }),
+        ...(status && { status }),
+        user: userId,
+      };
+
+      const leaves = await Leave.find(searchFilter)
         .skip(skipCount)
         .limit(limit)
         .sort({
@@ -105,9 +145,7 @@ export default class LeaveController {
         })
         .exec();
 
-      const totalLeavesCount = await Leave.countDocuments({
-        user: userId,
-      }).exec();
+      const totalLeavesCount = await Leave.countDocuments(searchFilter).exec();
       const totalPages = Math.ceil(totalLeavesCount / limit);
 
       return { leaves, totalPages };
