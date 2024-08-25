@@ -3,7 +3,6 @@ import { ActionFunction, LoaderFunction, redirect } from "@remix-run/node";
 import { Form } from "@remix-run/react";
 import TextInput from "~/components/inputs/text-input";
 import UserController from "~/controllers/UserController";
-import { getSession } from "~/utils/auth-session";
 
 export default function Login() {
   return (
@@ -49,6 +48,6 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const adminController = await new UserController(request);
+  const adminController = new UserController(request);
   return (await adminController.getUserId()) ? redirect("/admin") : null;
 };
