@@ -90,17 +90,28 @@ export default class LeaveController {
     }
   }
 
-  public getMyLeaves = async () => {
+  public getMyLeaves = async ({ page, limit = 10 }) => {
     const session = await getFlashSession(this.request.headers.get("Cookie"));
-
+    const skipCount = (page - 1) * limit;
     try {
       const userController = new UserController(this.request);
 
       const userId = await userController.getUserId();
 
-      const leaves = await Leave.find({ user: userId });
+      const leaves = await Leave.find({ user: userId })
+        .skip(skipCount)
+        .limit(limit)
+        .sort({
+          createdAt: "desc",
+        })
+        .exec();
 
-      return leaves;
+      const totalLeavesCount = await Leave.countDocuments({
+        user: userId,
+      }).exec();
+      const totalPages = Math.ceil(totalLeavesCount / limit);
+
+      return { leaves, totalPages };
     } catch (error) {
       session.flash("message", {
         title: "Something went wrong!",
