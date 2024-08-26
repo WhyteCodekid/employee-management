@@ -1,6 +1,6 @@
 import { redirect } from "@remix-run/node";
 import type { DepartmentInterface } from "../utils/types";
-import { commitFlashSession, getFlashSession } from "~/flash-session";
+import { commitFlashSession, getFlashSession } from "~/utils/flash-session";
 import Department from "~/models/Department";
 
 export default class DepartmentController {
@@ -70,9 +70,6 @@ export default class DepartmentController {
       const departments = await Department.find(searchFilter)
         .skip(skipCount)
         .limit(limit)
-        .populate("parent")
-        .populate("manager")
-        .populate("supervisors")
         .sort({
           createdAt: "desc",
         })
@@ -86,7 +83,7 @@ export default class DepartmentController {
       return { departments, totalPages };
     } catch (error) {
       console.log(error);
-      session.flash("alert", {
+      session.flash("message", {
         title: "Error!",
         status: "error",
         message: "Error retrieving departments",
@@ -129,7 +126,7 @@ export default class DepartmentController {
     description,
   }: {
     name: string;
-    parent: string;
+    parent?: string;
     description: string;
   }) => {
     const session = await getFlashSession(this.request.headers.get("Cookie"));
@@ -159,20 +156,15 @@ export default class DepartmentController {
         isParent: parent ? false : true,
       });
 
-      if (!department) {
-        return {
-          status: "error",
-          code: 400,
-          message: "Error adding department",
-          errors: [
-            {
-              field: "name",
-              message: "Error adding department",
-            },
-          ],
-        };
-      }
-
+      session.flash("message", {
+        title: "Department created!",
+        status: "success",
+      });
+      return redirect("/admin/departments", {
+        headers: {
+          "Set-Cookie": await commitFlashSession(session),
+        },
+      });
       return {
         status: "success",
         code: 200,
@@ -181,7 +173,15 @@ export default class DepartmentController {
       };
     } catch (error) {
       console.log(error);
-
+      session.flash("message", {
+        title: "Something went wrong!",
+        status: "error",
+      });
+      return redirect("/admin/departments", {
+        headers: {
+          "Set-Cookie": await commitFlashSession(session),
+        },
+      });
       return {
         status: "error",
         code: 400,
@@ -208,10 +208,10 @@ export default class DepartmentController {
   }: {
     _id: string;
     name: string;
-    parent: string;
+    parent?: string;
     description: string;
-    supervisors: string[];
-    manager: string;
+    supervisors?: string[];
+    manager?: string;
   }) => {
     const session = await getFlashSession(this.request.headers.get("Cookie"));
 
@@ -228,18 +228,25 @@ export default class DepartmentController {
         { new: true }
       );
 
-      return {
+      session.flash("message", {
+        title: "Department updated successfully!",
         status: "success",
-        code: 200,
-        message: "Department updated successfully",
-        data: updated,
-      };
+      });
+      return redirect("/admin/departments", {
+        headers: {
+          "Set-Cookie": await commitFlashSession(session),
+        },
+      });
     } catch (error) {
-      return {
+      session.flash("message", {
+        title: "Something went wrong!",
         status: "error",
-        code: 400,
-        message: "Error updating department",
-      };
+      });
+      return redirect("/admin/departments", {
+        headers: {
+          "Set-Cookie": await commitFlashSession(session),
+        },
+      });
     }
   };
 
@@ -254,19 +261,27 @@ export default class DepartmentController {
     try {
       await Department.findByIdAndDelete(_id);
 
-      return {
+      session.flash("message", {
+        title: "Department deleted successfully!",
         status: "success",
-        code: 200,
-        message: "Department deleted successfully",
-      };
+      });
+      return redirect("/admin/departments", {
+        headers: {
+          "Set-Cookie": await commitFlashSession(session),
+        },
+      });
     } catch (error) {
       console.log(error);
 
-      return {
+      session.flash("message", {
+        title: "Something went wrong!",
         status: "error",
-        code: 400,
-        message: "Error deleting department",
-      };
+      });
+      return redirect("/admin/departments", {
+        headers: {
+          "Set-Cookie": await commitFlashSession(session),
+        },
+      });
     }
   };
 }

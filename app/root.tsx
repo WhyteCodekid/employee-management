@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import type { LinksFunction, LoaderFunction } from "@remix-run/node";
 import {
   json,
@@ -13,9 +14,8 @@ import { Toaster, toast } from "sonner";
 import moment from "moment";
 import { ThemeProvider } from "next-themes";
 import { NextUIProvider } from "@nextui-org/react";
-import styles from "./tailwind.css";
 import { commitFlashSession, getFlashSession } from "./utils/flash-session";
-import { useEffect } from "react";
+import styles from "./tailwind.css";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
@@ -57,7 +57,7 @@ export default function App() {
         <NextUIProvider>
           <ThemeProvider attribute="class" defaultTheme="light">
             <Toaster position="bottom-right" richColors />
-            <Outlet />
+            <Outlet context={{ flashMessage: message }} />
             <ScrollRestoration />
             <Scripts />
             <LiveReload />

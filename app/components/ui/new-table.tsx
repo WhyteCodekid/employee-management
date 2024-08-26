@@ -10,10 +10,10 @@ import {
 } from "@nextui-org/react";
 
 import noDataIllustration from "~/assets/illustrations/no-data.svg";
+import { useNavigation } from "@remix-run/react";
 
 const CustomTable = ({
   columns,
-  loadingState,
   children,
   page,
   setPage,
@@ -22,7 +22,6 @@ const CustomTable = ({
   customHeightClass,
 }: {
   columns: string[];
-  loadingState: any;
   children: ReactNode | any;
   page: number;
   setPage: (page: number) => void;
@@ -30,8 +29,10 @@ const CustomTable = ({
   hidePagination?: boolean;
   customHeightClass?: string;
 }) => {
+  const navigation = useNavigation();
+
   return (
-    <div className="h-full flex flex-col gap-1">
+    <div className="h-full w-full flex flex-col gap-1">
       <Table
         aria-label="data table"
         classNames={{
@@ -39,9 +40,9 @@ const CustomTable = ({
             customHeightClass ? customHeightClass : "md:!h-[78vh]"
           } h-[65vh] overflow-y-auto w-screen md:w-full overflow-x-auto  shadow-none`,
           wrapper:
-            "dark:bg-slate-900 vertical-scrollbar horizontal-scrollbar shadow-none bg-white rounded-2xl dark:border border-white/5",
-          th: "dark:bg-slate-800",
-          td: "font-nunito text-xs text-slate-500 dark:text-slate-200 ",
+            "vertical-scrollbar horizontal-scrollbar shadow-none rounded-2xl dark:border border-white/5",
+          th: "",
+          td: "font-quicksand text-xs text-slate-500 dark:text-slate-200",
         }}
       >
         <TableHeader>
@@ -56,8 +57,8 @@ const CustomTable = ({
         </TableHeader>
 
         <TableBody
-          loadingState={loadingState}
-          loadingContent={<Spinner />}
+          loadingState={navigation.state === "loading" ? "loading" : "idle"}
+          loadingContent={<Spinner color="success" size="lg" />}
           emptyContent={
             <div className="md:!h-[63vh] h-[60vh] flex flex-col gap-8 items-center justify-center">
               <img src={noDataIllustration} alt="No data" className="w-1/3" />

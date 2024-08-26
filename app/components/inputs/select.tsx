@@ -16,14 +16,13 @@ const CustomSelect = ({
 
   return (
     <Select
-      className="font-nunito text-lg"
+      className="font-nunito"
       classNames={{
-        label:
-          "text-sm md:text-base font-medium font-sen text-slate-800 dark:text-slate-100",
-        popoverContent: "bg-white dark:bg-slate-900 font-nunito",
+        label: "font-medium font-montserrat text-slate-800 dark:text-slate-100",
+        popoverContent: "bg-white font-nunito dark:bg-content2",
       }}
       variant="bordered"
-      color="primary"
+      color="success"
       labelPlacement="outside"
       placeholder=" "
       isInvalid={
