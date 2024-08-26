@@ -210,10 +210,28 @@ export default class UserController {
     firstName,
     lastName,
     email,
+    role,
+    department,
+    phone,
+    dateOfBirth,
+    permissions,
+    position,
+    image,
+    baseSalary,
+    descriptor,
   }: {
     firstName: string;
     lastName: string;
     email: string;
+    role: string;
+    department: string;
+    phone: string;
+    dateOfBirth: string;
+    permissions: string[];
+    position: string;
+    image: string;
+    baseSalary: number;
+    descriptor: string;
   }) => {
     const userId = await this.getUserId();
     const session = await getFlashSession(this.request.headers.get("Cookie"));
@@ -225,6 +243,15 @@ export default class UserController {
           firstName,
           lastName,
           email,
+          role,
+          department,
+          phone,
+          dateOfBirth,
+          permissions,
+          position,
+          image,
+          baseSalary,
+          descriptor,
         },
         {
           new: true,
