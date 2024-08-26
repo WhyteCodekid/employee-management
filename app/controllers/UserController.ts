@@ -432,7 +432,7 @@ export default class UserController {
         position,
         image,
         baseSalary,
-        password,
+        password: await bcrypt.hash(password, 10),
       });
 
       const newFace = await Face.create({
