@@ -10,9 +10,11 @@ import DepartmentController from "~/controllers/DepartmentController";
 import axios from "axios";
 import Face from "~/models/Faces";
 import knownFaces from "~/assets/faces.json";
+import AttendanceController from "~/controllers/AttendanceController";
+import moment from "moment";
 
 const App = () => {
-  const { search_term, page, departments, users } =
+  const { search_term, page, attendance, users } =
     useLoaderData<typeof loader>();
   const navigate = useNavigate();
 
@@ -82,7 +84,6 @@ const App = () => {
             const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
             const box = detection.detection.box;
             const { label, distance } = bestMatch;
-            console.log("label", label);
 
             if (label !== "unknown") {
               faceFound = true;
@@ -156,19 +157,22 @@ const App = () => {
           }
           totalPages={1}
         >
-          {departments?.map(
-            (
-              department: { name: string; description: string },
-              index: number
-            ) => (
-              <TableRow key={index}>
-                <TableCell>{department.name}</TableCell>
-                <TableCell>{department.description}</TableCell>
-                <TableCell>{department.description}</TableCell>
-                <TableCell>{department.description}</TableCell>
-              </TableRow>
-            )
-          )}
+          {attendance?.map((department, index) => (
+            <TableRow key={index}>
+              <TableCell className="font-semibold">
+                {department?.user?.staffId}
+              </TableCell>
+              <TableCell>
+                {department?.user?.firstName} {department?.user?.lastName}
+              </TableCell>
+              <TableCell>
+                {moment(department?.checkInTime).format("Do MMMM, YYYY")}
+              </TableCell>
+              <TableCell>
+                {moment(department?.checkOutTime).format("Do MMMM, YYYY")}
+              </TableCell>
+            </TableRow>
+          ))}
         </CustomTable>
       </section>
     </div>
@@ -184,8 +188,8 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   const users = await Face.find().populate("user");
 
-  const departmentController = new DepartmentController(request);
-  const { departments, totalPages } = await departmentController.getDepartments(
+  const attendanceController = new AttendanceController(request);
+  const { attendance, totalPages } = await attendanceController.todayAttendance(
     {
       page,
       search_term,
@@ -195,7 +199,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   return {
     search_term,
     page,
-    departments,
+    attendance,
     totalPages,
     users,
   };
