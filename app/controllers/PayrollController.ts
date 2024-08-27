@@ -245,6 +245,50 @@ export default class PayrollController {
     }
   };
 
+  public async getUserPayrollHistory({
+    page,
+    limit = 10,
+  }: {
+    page: number;
+    limit?: number;
+  }): Promise<
+    { deductionBonus: DeductionBonusInterface[]; totalPages: number } | any
+  > {
+    const session = await getFlashSession(this.request.headers.get("Cookie"));
+    try {
+      const skipCount = (page - 1) * limit;
+      const userId = await new UserController(this.request).getUserId();
+
+      const [deductionBonus, totalDeductionBonusesCount] = await Promise.all([
+        DeductionBonus.find({ user: userId })
+          .skip(skipCount)
+          .limit(limit)
+          .populate("user")
+          .sort({
+            createdAt: "desc",
+          })
+          .exec(),
+        DeductionBonus.countDocuments({ user: userId }).exec(),
+      ]);
+
+      const totalPages = Math.ceil(totalDeductionBonusesCount / limit);
+      return { deductionBonus, totalPages };
+    } catch (error) {
+      console.log(error);
+      session.flash("message", {
+        title: "Error!",
+        status: "error",
+        description: "Error retrieving deductionBonus",
+      });
+
+      return redirect(this.path, {
+        headers: {
+          "Set-Cookie": await commitFlashSession(session),
+        },
+      });
+    }
+  }
+
   public generatePayslip = async ({
     month,
     year,
