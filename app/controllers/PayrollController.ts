@@ -115,8 +115,9 @@ export default class PayrollController {
     type,
     amount,
   }: {
-    question: string;
-    answer: string;
+    user: string;
+    type: string;
+    amount: string;
   }) => {
     const session = await getFlashSession(this.request.headers.get("Cookie"));
 
