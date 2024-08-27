@@ -18,19 +18,17 @@ import CustomTable from "~/components/ui/new-table";
 import { FaqInterface } from "~/utils/types";
 import TextareaInput from "~/components/inputs/textarea";
 import FaqController from "~/controllers/FaqController";
-import { toast } from "sonner";
-import axios from "axios";
-import useSWR from "swr";
 import { UsersCombobox } from "~/components/inputs/combobox";
 import PayrollController from "~/controllers/PayrollController";
 import CustomSelect from "~/components/inputs/select";
+import moment from "moment";
 
 export default function AdminEmployeesManagement() {
   const flashMessage = useOutletContext<{
     message: string;
     status: "error" | "success";
   }>();
-  const { search_term, page, faqs, totalPages } =
+  const { search_term, page, deductionBonus, totalPages } =
     useLoaderData<typeof loader>();
   const navigate = useNavigate();
 
@@ -57,7 +55,7 @@ export default function AdminEmployeesManagement() {
 
   return (
     <div>
-      <Header title="Manage Frequently Asked Questions" />
+      <Header title="Manage Deduction/Bonuses" />
 
       <SearchAndCreateRecordBar
         buttonText="New Transaction"
@@ -71,7 +69,7 @@ export default function AdminEmployeesManagement() {
           <UsersCombobox />
           <TextInput label="Amount" name="amount" isRequired />
           <CustomSelect label="Transaction Type" name="type">
-            <SelectItem key={"bonus"}>Bounus</SelectItem>
+            <SelectItem key={"bonus"}>Bonus</SelectItem>
             <SelectItem key={"deduction"}>Deductions</SelectItem>
           </CustomSelect>
         </div>
@@ -79,24 +77,32 @@ export default function AdminEmployeesManagement() {
 
       <div className="px-4">
         <CustomTable
-          columns={["Question", "Answer", "Actions"]}
+          columns={[
+            "Date",
+            "Employee",
+            "Transaction Type",
+            "Amount",
+            "Actions",
+          ]}
           page={page}
           setPage={(page) =>
             navigate(`?page=${page}&search_term=${search_term}`)
           }
           totalPages={totalPages}
         >
-          {faqs?.map((faq: FaqInterface, index: number) => (
+          {deductionBonus?.map((transaction: any, index: number) => (
             <TableRow key={index}>
-              <TableCell>{faq.question}</TableCell>
-              <TableCell>{faq.answer}</TableCell>
+              <TableCell>{moment(transaction.createdAt).date()}</TableCell>
+              <TableCell>{transaction.user?.firstName}</TableCell>
+              <TableCell>{transaction.type}</TableCell>
+              <TableCell>{transaction.amount}</TableCell>
               <TableCell className="flex items-center gap-2">
                 <Button
                   variant="flat"
                   color="primary"
                   size="sm"
                   onPress={() => {
-                    setFaq(faq);
+                    // setFaq(faq);
                     editDisclosure.onOpen();
                   }}
                 >
@@ -107,7 +113,7 @@ export default function AdminEmployeesManagement() {
                   color="danger"
                   size="sm"
                   onPress={() => {
-                    setFaqId(faq._id);
+                    // setFaqId(faq._id);
                     deleteDisclosure.onOpen();
                   }}
                 >
@@ -207,17 +213,19 @@ export const loader: LoaderFunction = async ({ request }) => {
   const search_term = url.searchParams.get("search_term") || "";
   const page = parseInt(url.searchParams.get("page") || "1");
 
-  const faqController = new FaqController(request);
-  const { faqs, totalPages } = await faqController.getFaqs({
-    page,
-    search_term,
-    limit: 15,
-  });
+  const payrollController = new PayrollController(request);
+
+  const { deductionBonus, totalPages } =
+    await payrollController.getDeductionBonuses({
+      page,
+      search_term,
+      limit: 15,
+    });
 
   return {
     search_term,
     page,
-    faqs,
+    deductionBonus,
     totalPages,
   };
 };
