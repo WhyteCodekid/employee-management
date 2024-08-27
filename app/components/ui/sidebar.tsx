@@ -12,7 +12,7 @@ export default function Sidebar() {
     <aside
       className={`h-screen dark:bg-content2 bg-white border-r dark:border-white/5 ${
         open ? "w-[17%]" : "w-20"
-      } relative transition-all duration-400 flex flex-col justify-between`}
+      } relative transition-all duration-400 flex flex-col`}
     >
       <Button
         className="absolute top-4 -right-4"
@@ -26,7 +26,9 @@ export default function Sidebar() {
       </Button>
 
       {/* header */}
-      <DashboardBox className="size-10" />
+      <div className="h-28">
+        <DashboardBox className="size-10" />
+      </div>
 
       {/* admin nav links */}
       <div>
@@ -43,7 +45,7 @@ export default function Sidebar() {
                       isActive ? "bg-blue-800" : ""
                     } flex items-center gap-2 px-4 py-2 hover:bg-blue-800 transition-all duration-300 rounded-md ${
                       open ? "" : "justify-center"
-                    } font-montserrat text-sm font-medium`
+                    } font-montserrat text-sm font-medium mx-2`
                   }
                 >
                   {link.icon}
@@ -57,10 +59,10 @@ export default function Sidebar() {
                 end={true}
                 className={({ isActive }) =>
                   `${
-                    isActive ? "bg-blue-800" : ""
-                  } flex items-center gap-2 px-4 py-2 hover:bg-blue-800 transition-all duration-300 rounded-md ${
+                    isActive ? "bg-blue-800 text-white" : ""
+                  } flex items-center gap-2 px-4 py-2 hover:bg-blue-800 hover:text-white transition-all duration-300 rounded-lg ${
                     open ? "" : "justify-center"
-                  } font-montserrat text-sm font-medium`
+                  } font-montserrat text-sm font-medium mx-2`
                 }
               >
                 {link.icon} <span> {link.label} </span>
