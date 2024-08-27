@@ -1,8 +1,8 @@
 import { Schema } from "mongoose";
 import mongoose from "~/utils/mongoose";
-import { FaqInterface } from "~/utils/types";
+import { JobInterface } from "~/utils/types";
 
-const schema = new Schema<FaqInterface>(
+const schema = new Schema<JobInterface>(
   {
     question: {
       type: String,
@@ -18,11 +18,11 @@ const schema = new Schema<FaqInterface>(
   }
 );
 
-let Faq: mongoose.Model<FaqInterface>;
+let Job: mongoose.Model<JobInterface>;
 try {
-  Faq = mongoose.model<FaqInterface>("faqs");
+  Job = mongoose.model<JobInterface>("jobs");
 } catch (error) {
-  Faq = mongoose.model<FaqInterface>("faqs", schema);
+  Job = mongoose.model<JobInterface>("jobs", schema);
 }
 
-export default Faq;
+export default Job;
