@@ -6,6 +6,7 @@ import User from "~/models/User";
 import Department from "~/models/Department";
 import Faq from "~/models/Faq";
 import Leave from "~/models/Leave";
+import UserController from "./UserController";
 
 export default class AttendanceController {
   private request: Request;
@@ -301,6 +302,41 @@ export default class AttendanceController {
         status: "error",
       });
       return redirect("/admin/attendances", {
+        headers: {
+          "Set-Cookie": await commitFlashSession(session),
+        },
+      });
+    }
+  }
+
+  // get totals for current user
+  public async getUserTotals() {
+    const session = await getFlashSession(this.request.headers.get("Cookie"));
+    const userId = await new UserController(this.request).getUserId();
+
+    try {
+      const attendanceCount = await Attendance.countDocuments({
+        user: userId,
+      }).exec();
+      const leaveCount = await Leave.countDocuments({
+        user: userId,
+      }).exec();
+      const pendingLeaveCount = await Leave.countDocuments({
+        user: userId,
+        status: "pending",
+      }).exec();
+
+      return {
+        attendanceCount,
+        leaveCount,
+        pendingLeaveCount,
+      };
+    } catch (error) {
+      session.flash("message", {
+        title: "Something went wrong!",
+        status: "error",
+      });
+      return redirect("/staff", {
         headers: {
           "Set-Cookie": await commitFlashSession(session),
         },
