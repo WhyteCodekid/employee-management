@@ -62,6 +62,7 @@ export default class PayrollController {
         DeductionBonus.find(searchFilter)
           .skip(skipCount)
           .limit(limit)
+          .populate("user")
           .sort({
             createdAt: "desc",
           })
@@ -96,7 +97,8 @@ export default class PayrollController {
     id: string
   ): Promise<DeductionBonusInterface | null> {
     try {
-      const deductionBonus = await DeductionBonus.findById(id);
+      const deductionBonus = await DeductionBonus.findById(id).populate("user");
+
       return deductionBonus;
     } catch (error) {
       console.error("Error retrieving deductionBonus:", error);
@@ -132,7 +134,7 @@ export default class PayrollController {
         title: "Record created!",
         status: "success",
       });
-      return redirect("/admin/deductionBonus", {
+      return redirect("/admin/payroll", {
         headers: {
           "Set-Cookie": await commitFlashSession(session),
         },
@@ -143,7 +145,7 @@ export default class PayrollController {
         title: "Something went wrong!",
         status: "error",
       });
-      return redirect("/admin/deductionBonus", {
+      return redirect("/admin/payroll", {
         headers: {
           "Set-Cookie": await commitFlashSession(session),
         },
@@ -184,7 +186,7 @@ export default class PayrollController {
         title: "DeductionBonus updated successfully!",
         status: "success",
       });
-      return redirect("/admin/deductionBonus", {
+      return redirect("/admin/payroll", {
         headers: {
           "Set-Cookie": await commitFlashSession(session),
         },
@@ -194,7 +196,7 @@ export default class PayrollController {
         title: "Something went wrong!",
         status: "error",
       });
-      return redirect("/admin/deductionBonus", {
+      return redirect("/admin/payroll", {
         headers: {
           "Set-Cookie": await commitFlashSession(session),
         },
@@ -218,7 +220,7 @@ export default class PayrollController {
         status: "success",
         description: "DeductionBonus deleted successfully",
       });
-      return redirect("/admin/deductionBonus", {
+      return redirect("/admin/payroll", {
         headers: {
           "Set-Cookie": await commitFlashSession(session),
         },
@@ -230,7 +232,7 @@ export default class PayrollController {
         title: "Something went wrong!",
         status: "error",
       });
-      return redirect("/admin/deductionBonus", {
+      return redirect("/admin/payroll", {
         headers: {
           "Set-Cookie": await commitFlashSession(session),
         },
