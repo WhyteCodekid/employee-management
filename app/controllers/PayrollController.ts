@@ -62,6 +62,7 @@ export default class PayrollController {
         DeductionBonus.find(searchFilter)
           .skip(skipCount)
           .limit(limit)
+          .populate("user")
           .sort({
             createdAt: "desc",
           })
@@ -96,7 +97,8 @@ export default class PayrollController {
     id: string
   ): Promise<DeductionBonusInterface | null> {
     try {
-      const deductionBonus = await DeductionBonus.findById(id);
+      const deductionBonus = await DeductionBonus.findById(id).populate("user");
+
       return deductionBonus;
     } catch (error) {
       console.error("Error retrieving deductionBonus:", error);
