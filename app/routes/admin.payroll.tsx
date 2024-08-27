@@ -1,5 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Button, TableCell, TableRow, useDisclosure } from "@nextui-org/react";
+import {
+  Button,
+  SelectItem,
+  TableCell,
+  TableRow,
+  useDisclosure,
+} from "@nextui-org/react";
 import { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { useLoaderData, useNavigate, useOutletContext } from "@remix-run/react";
 import { useEffect, useState } from "react";
@@ -15,6 +21,9 @@ import FaqController from "~/controllers/FaqController";
 import { toast } from "sonner";
 import axios from "axios";
 import useSWR from "swr";
+import { UsersCombobox } from "~/components/inputs/combobox";
+import PayrollController from "~/controllers/PayrollController";
+import CustomSelect from "~/components/inputs/select";
 
 export default function AdminEmployeesManagement() {
   const flashMessage = useOutletContext<{
@@ -24,21 +33,6 @@ export default function AdminEmployeesManagement() {
   const { search_term, page, faqs, totalPages } =
     useLoaderData<typeof loader>();
   const navigate = useNavigate();
-
-  // combobox stuff
-  const [searchText, setSearchText] = useState("");
-  const fetcher = async (url: string) => {
-    try {
-      const response = await axios.get(url);
-      console.log(response.data);
-
-      return response.data;
-    } catch (error: any) {
-      console.log(error);
-      toast.error("Error fetching users. " + error.message);
-    }
-  };
-  const { data, isLoading } = useSWR(`/api/users?search_term=${searchText}`);
 
   // delete user stuff
   const deleteDisclosure = useDisclosure();
@@ -66,16 +60,20 @@ export default function AdminEmployeesManagement() {
       <Header title="Manage Frequently Asked Questions" />
 
       <SearchAndCreateRecordBar
-        buttonText="New FAQ"
-        modalTitle="Add New Frequently Asked Question"
+        buttonText="New Transaction"
+        modalTitle="Add Bonus/Deduction"
         searchValue={search_term}
         pageValue={page}
-        formIntent="create-faq"
+        formIntent="new-transaction"
         flashMessage={flashMessage}
       >
         <div className="flex flex-col gap-5">
-          <TextInput label="Question" name="question" isRequired />
-          <TextareaInput label="Answer" name="answer" isRequired />
+          <UsersCombobox />
+          <TextInput label="Amount" name="amount" isRequired />
+          <CustomSelect label="Transaction Type" name="type">
+            <SelectItem key={"bonus"}>Bounus</SelectItem>
+            <SelectItem key={"deduction"}>Deductions</SelectItem>
+          </CustomSelect>
         </div>
       </SearchAndCreateRecordBar>
 
@@ -182,10 +180,12 @@ export const action: ActionFunction = async ({ request }) => {
   const formValues = Object.fromEntries(formData.entries());
 
   const faqController = new FaqController(request);
-  if (formValues.intent === "create-faq") {
-    return faqController.createFaq({
-      question: formValues.question as string,
-      answer: formValues.answer as string,
+  const payrollController = new PayrollController(request);
+  if (formValues.intent === "new-transaction") {
+    return payrollController.createDeductionBonus({
+      user: formValues.user as string,
+      type: formValues.type as string,
+      amount: formValues.amount as string,
     });
   }
   if (formValues.intent === "update-faq") {
