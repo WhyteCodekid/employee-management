@@ -111,8 +111,9 @@ export default class PayrollController {
    * @returns DeductionBonusInterface
    */
   public createDeductionBonus = async ({
-    question,
-    answer,
+    user,
+    type,
+    amount,
   }: {
     question: string;
     answer: string;
@@ -120,30 +121,14 @@ export default class PayrollController {
     const session = await getFlashSession(this.request.headers.get("Cookie"));
 
     try {
-      const existingDeductionBonus = await DeductionBonus.findOne({ question });
-
-      if (existingDeductionBonus) {
-        return {
-          status: "error",
-          code: 400,
-          message: "DeductionBonus already exists",
-          errors: [
-            {
-              field: "question",
-              message:
-                "A deductionBonus with this question already exists. Please choose a different question.",
-            },
-          ],
-        };
-      }
-
       const deductionBonus = await DeductionBonus.create({
-        question,
-        answer,
+        user,
+        type,
+        amount,
       });
 
       session.flash("message", {
-        title: "DeductionBonus created!",
+        title: "Record created!",
         status: "success",
       });
       return redirect("/admin/deductionBonus", {
