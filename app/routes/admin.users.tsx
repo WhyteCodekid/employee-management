@@ -216,33 +216,39 @@ export default function AdminEmployeesManagement() {
         size="lg"
       >
         <div className="flex flex-col gap-5">
+          <input
+            type="hidden"
+            name="descriptor"
+            value={JSON.stringify(Array.from(descriptor || []))}
+          />
+
           <TextInput
             label="User ID"
             name="id"
-            value={userData?._id}
+            defaultValue={userData?._id}
             className="hidden"
           />
           <TextInput
             label="First Name"
             name="firstName"
-            value={userData?.firstName}
+            defaultValue={userData?.firstName}
           />
           <TextInput
             label="Last Name"
             name="lastName"
-            value={userData?.lastName}
+            defaultValue={userData?.lastName}
           />
           <TextInput
             label="Email"
             name="email"
             type="email"
-            value={userData?.email}
+            defaultValue={userData?.email}
           />
           <TextInput
             label="Phone"
             name="phone"
             type="tel"
-            value={userData?.phone}
+            defaultValue={userData?.phone}
           />
           <CustomSelect
             selectedKeys={[userData?.role as string]}
@@ -292,10 +298,13 @@ export const action: ActionFunction = async ({ request }) => {
 
   const userController = new UserController(request);
   if (formValues.intent === "create-employee") {
-    return userController.createUser(formValues);
+    return await userController.createUser(formValues);
+  }
+  if (formValues.intent === "update-user") {
+    return await userController.updateMyProfile(formValues);
   }
   if (formValues.intent === "delete") {
-    return userController.deleteUser({ userId: formValues.id });
+    return await userController.deleteUser({ userId: formValues.id });
   }
 
   return null;

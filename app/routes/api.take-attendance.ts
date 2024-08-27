@@ -46,6 +46,7 @@ export const action: ActionFunction = async ({ request }) => {
     await Attendance.create({
       user: payload.user,
       checkInTime: currentTime,
+      checkOutTime: null,
     });
   }
 

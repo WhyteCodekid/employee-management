@@ -280,8 +280,6 @@ export const loader: LoaderFunction = async ({ request }) => {
     status,
   });
 
-  console.log(leaves);
-
   return {
     search_term,
     page,

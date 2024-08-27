@@ -181,8 +181,6 @@ export const loader: LoaderFunction = async ({ request }) => {
     limit: 15,
   });
 
-  console.log(faqs);
-
   return {
     search_term,
     page,

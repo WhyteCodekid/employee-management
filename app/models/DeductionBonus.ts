@@ -11,8 +11,8 @@ const schema = new Schema<DeductionBonusInterface>(
     },
     type: {
       type: String,
-      enum: ["addition", "deduction"],
-      default: "addition",
+      enum: ["bonus", "deduction", ""],
+      default: "bonus",
     },
     amount: {
       type: Number,
