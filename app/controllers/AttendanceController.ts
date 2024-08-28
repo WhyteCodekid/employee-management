@@ -2,6 +2,11 @@ import { redirect } from "@remix-run/node";
 import type { AttendanceInterface } from "../utils/types";
 import { commitFlashSession, getFlashSession } from "~/utils/flash-session";
 import Attendance from "~/models/Attendance";
+import User from "~/models/User";
+import Department from "~/models/Department";
+import Faq from "~/models/Faq";
+import Leave from "~/models/Leave";
+import UserController from "./UserController";
 
 export default class AttendanceController {
   private request: Request;
@@ -79,6 +84,57 @@ export default class AttendanceController {
       const totalAttendancesCount = await Attendance.countDocuments(
         searchFilter
       ).exec();
+      const totalPages = Math.ceil(totalAttendancesCount / limit);
+
+      return { attendances, totalPages };
+    } catch (error) {
+      console.log(error);
+      session.flash("message", {
+        title: "Error!",
+        status: "error",
+        message: "Error retrieving attendances",
+      });
+
+      return redirect(this.path, {
+        headers: {
+          "Set-Cookie": await commitFlashSession(session),
+        },
+      });
+      // throw new Error("Error retrieving attendances");
+    }
+  }
+
+  public async getMyAttendances({
+    page,
+    month,
+    limit = 10,
+  }: {
+    page: number;
+    month?: string;
+    limit?: number;
+  }): Promise<
+    { attendances: AttendanceInterface[]; totalPages: number } | any
+  > {
+    const session = await getFlashSession(this.request.headers.get("Cookie"));
+    const skipCount = (page - 1) * limit;
+
+    const userController = new UserController(this.request);
+    const userId = await userController.getUserId();
+
+    try {
+      const attendances = await Attendance.find({
+        user: userId,
+      })
+        .skip(skipCount)
+        .limit(limit)
+        .sort({
+          createdAt: "desc",
+        })
+        .exec();
+
+      const totalAttendancesCount = await Attendance.countDocuments({
+        user: userId,
+      }).exec();
       const totalPages = Math.ceil(totalAttendancesCount / limit);
 
       return { attendances, totalPages };
@@ -183,11 +239,6 @@ export default class AttendanceController {
           "Set-Cookie": await commitFlashSession(session),
         },
       });
-      return {
-        status: "error",
-        code: 400,
-        message: "Error adding department",
-      };
     }
   };
 
@@ -273,4 +324,74 @@ export default class AttendanceController {
       console.error("Error retrieving today's attendance:", error);
     }
   };
+
+  // get totals for, users, attendance, departments
+  public async getTotals() {
+    const session = await getFlashSession(this.request.headers.get("Cookie"));
+
+    try {
+      const usersCount = await User.countDocuments().exec();
+      const attendanceCount = await Attendance.countDocuments().exec();
+      const departmentsCount = await Department.countDocuments().exec();
+      const faqCount = await Faq.countDocuments().exec();
+      const leaveCount = await Leave.countDocuments().exec();
+      const pendingLeaveCount = await Leave.countDocuments({
+        status: "pending",
+      }).exec();
+
+      return {
+        usersCount,
+        attendanceCount,
+        departmentsCount,
+        faqCount,
+        leaveCount,
+        pendingLeaveCount,
+      };
+    } catch (error) {
+      session.flash("message", {
+        title: "Something went wrong!",
+        status: "error",
+      });
+      return redirect("/admin/attendances", {
+        headers: {
+          "Set-Cookie": await commitFlashSession(session),
+        },
+      });
+    }
+  }
+
+  // get totals for current user
+  public async getUserTotals() {
+    const session = await getFlashSession(this.request.headers.get("Cookie"));
+    const userId = await new UserController(this.request).getUserId();
+
+    try {
+      const attendanceCount = await Attendance.countDocuments({
+        user: userId,
+      }).exec();
+      const leaveCount = await Leave.countDocuments({
+        user: userId,
+      }).exec();
+      const pendingLeaveCount = await Leave.countDocuments({
+        user: userId,
+        status: "pending",
+      }).exec();
+
+      return {
+        attendanceCount,
+        leaveCount,
+        pendingLeaveCount,
+      };
+    } catch (error) {
+      session.flash("message", {
+        title: "Something went wrong!",
+        status: "error",
+      });
+      return redirect("/staff", {
+        headers: {
+          "Set-Cookie": await commitFlashSession(session),
+        },
+      });
+    }
+  }
 }
