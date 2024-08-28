@@ -42,7 +42,7 @@ export default function AdminLayout() {
   return (
     <div className="min-h-screen pb-6 flex flex-col gap-5 bg-slate-300/30 dark:bg-content1">
       {/* top nav */}
-      <div className="h-16 bg-white px-4 dark:bg-content2 flex items-center justify-between">
+      <div className="h-16 bg-white px-4 dark:bg-content2 flex items-center justify-between sticky top-0">
         <h1 className="font-montserrat font-bold text-lg">
           Staff Interface | AEMS
         </h1>
