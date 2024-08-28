@@ -2,6 +2,8 @@ import { redirect } from "@remix-run/node";
 import { commitFlashSession, getFlashSession } from "~/utils/flash-session";
 import DeductionBonus from "~/models/DeductionBonus";
 import { DeductionBonusInterface } from "~/utils/types";
+import User from "~/models/User";
+import UserController from "./UserController";
 
 export default class PayrollController {
   private request: Request;
@@ -68,6 +70,53 @@ export default class PayrollController {
           })
           .exec(),
         DeductionBonus.countDocuments(searchFilter).exec(),
+      ]);
+
+      const totalPages = Math.ceil(totalDeductionBonusesCount / limit);
+      return { deductionBonus, totalPages };
+    } catch (error) {
+      console.log(error);
+      session.flash("message", {
+        title: "Error!",
+        status: "error",
+        description: "Error retrieving deductionBonus",
+      });
+
+      return redirect(this.path, {
+        headers: {
+          "Set-Cookie": await commitFlashSession(session),
+        },
+      });
+    }
+  }
+
+  public async geMytDeductionBonuses({
+    page,
+    search_term,
+    limit = 10,
+  }: {
+    page: number;
+    search_term?: string;
+    limit?: number;
+  }): Promise<
+    { deductionBonus: DeductionBonusInterface[]; totalPages: number } | any
+  > {
+    const session = await getFlashSession(this.request.headers.get("Cookie"));
+    const userController = new UserController(this.request);
+    const userId = await userController.getUserId();
+
+    try {
+      const skipCount = (page - 1) * limit;
+
+      const [deductionBonus, totalDeductionBonusesCount] = await Promise.all([
+        DeductionBonus.find({ user: userId })
+          .skip(skipCount)
+          .limit(limit)
+          .sort({
+            createdAt: "desc",
+          })
+          .exec(),
+        DeductionBonus.countDocuments({ user: userId }).exec(),
       ]);
 
       const totalPages = Math.ceil(totalDeductionBonusesCount / limit);
@@ -163,12 +212,14 @@ export default class PayrollController {
    */
   public updateDeductionBonus = async ({
     id,
-    question,
-    answer,
+    user,
+    type,
+    amount,
   }: {
     id: string;
-    question: string;
-    answer: string;
+    user: string;
+    type: string;
+    amount: string;
   }) => {
     const session = await getFlashSession(this.request.headers.get("Cookie"));
 
@@ -176,8 +227,9 @@ export default class PayrollController {
       const updated = await DeductionBonus.findByIdAndUpdate(
         id,
         {
-          question,
-          answer,
+          user,
+          type,
+          amount,
         },
         { new: true }
       );
@@ -233,6 +285,113 @@ export default class PayrollController {
         status: "error",
       });
       return redirect("/admin/payroll", {
+        headers: {
+          "Set-Cookie": await commitFlashSession(session),
+        },
+      });
+    }
+  };
+
+  public async getUserPayrollHistory({
+    page,
+    limit = 10,
+    month,
+  }: {
+    page: number;
+    limit?: number;
+    month: string;
+  }): Promise<
+    { deductionBonus: DeductionBonusInterface[]; totalPages: number } | any
+  > {
+    const session = await getFlashSession(this.request.headers.get("Cookie"));
+    try {
+      const skipCount = (page - 1) * limit;
+      const userId = await new UserController(this.request).getUserId();
+
+      const [deductionBonus, totalDeductionBonusesCount] = await Promise.all([
+        DeductionBonus.find({ user: userId })
+          .skip(skipCount)
+          .limit(limit)
+          .populate("user")
+          .sort({
+            createdAt: "desc",
+          })
+          .exec(),
+        DeductionBonus.countDocuments({ user: userId }).exec(),
+      ]);
+
+      const totalPages = Math.ceil(totalDeductionBonusesCount / limit);
+      return { deductionBonus, totalPages };
+    } catch (error) {
+      console.log(error);
+      session.flash("message", {
+        title: "Error!",
+        status: "error",
+        description: "Error retrieving deductionBonus",
+      });
+
+      return redirect(this.path, {
+        headers: {
+          "Set-Cookie": await commitFlashSession(session),
+        },
+      });
+    }
+  }
+
+  public generatePayslip = async ({
+    month,
+    year,
+  }: {
+    month: string;
+    year: string;
+  }) => {
+    const session = await getFlashSession(this.request.headers.get("Cookie"));
+
+    try {
+      const user = await new UserController(this.request).getUserId();
+
+      //  calculate total salary from the deductions and bonuses
+      const deductions = await DeductionBonus.find({
+        user: user?._id,
+        type: "deduction",
+      });
+
+      const bonuses = await DeductionBonus.find({
+        user: user?._id,
+        type: "bonus",
+      });
+
+      let totalDeductions = 0;
+      let totalBonuses = 0;
+
+      deductions.forEach((deduction) => {
+        totalDeductions += Number(deduction.amount);
+      });
+
+      bonuses.forEach((bonus) => {
+        totalBonuses += Number(bonus.amount);
+      });
+
+      const totalSalary = user?.baseSalary + totalBonuses - totalDeductions;
+
+      // //  create payslip
+      // const payslip = await Payslip.create({
+      //   user,
+      //   month,
+      //   year,
+      //   totalSalary,
+      //   totalDeductions,
+      //   totalBonuses,
+      // });
+
+      return totalSalary;
+    } catch (error) {
+      console.log(error);
+      session.flash("message", {
+        title: "Something went wrong!",
+        status: "error",
+      });
+      return redirect("/staff/payroll", {
         headers: {
           "Set-Cookie": await commitFlashSession(session),
         },
