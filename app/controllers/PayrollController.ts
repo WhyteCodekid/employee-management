@@ -90,6 +90,53 @@ export default class PayrollController {
     }
   }
 
+  public async geMytDeductionBonuses({
+    page,
+    search_term,
+    limit = 10,
+  }: {
+    page: number;
+    search_term?: string;
+    limit?: number;
+  }): Promise<
+    { deductionBonus: DeductionBonusInterface[]; totalPages: number } | any
+  > {
+    const session = await getFlashSession(this.request.headers.get("Cookie"));
+    const userController = new UserController(this.request);
+    const userId = await userController.getUserId();
+
+    try {
+      const skipCount = (page - 1) * limit;
+
+      const [deductionBonus, totalDeductionBonusesCount] = await Promise.all([
+        DeductionBonus.find({ user: userId })
+          .skip(skipCount)
+          .limit(limit)
+          .sort({
+            createdAt: "desc",
+          })
+          .exec(),
+        DeductionBonus.countDocuments({ user: userId }).exec(),
+      ]);
+
+      const totalPages = Math.ceil(totalDeductionBonusesCount / limit);
+      return { deductionBonus, totalPages };
+    } catch (error) {
+      console.log(error);
+      session.flash("message", {
+        title: "Error!",
+        status: "error",
+        description: "Error retrieving deductionBonus",
+      });
+
+      return redirect(this.path, {
+        headers: {
+          "Set-Cookie": await commitFlashSession(session),
+        },
+      });
+    }
+  }
+
   /**
    * Retrieve a single DeductionBonus
    * @param id string
@@ -248,9 +295,11 @@ export default class PayrollController {
   public async getUserPayrollHistory({
     page,
     limit = 10,
+    month,
   }: {
     page: number;
     limit?: number;
+    month: string;
   }): Promise<
     { deductionBonus: DeductionBonusInterface[]; totalPages: number } | any
   > {
