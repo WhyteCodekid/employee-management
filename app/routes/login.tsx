@@ -9,7 +9,11 @@ export default function Login() {
   return (
     <div className="grid grid-cols-2 h-screen">
       <div className="flex items-center justify-center">
-        <img src={banner} className="h-[100vh] object-cover" alt="" />
+        <img
+          src="https://th.bing.com/th/id/R.53d282c5bfc7904a7efcdcf0a59465d9?rik=mMsuGGpSyqOu9g&pid=ImgRaw&r=0"
+          className="h-[80vh] object-cover"
+          alt=""
+        />
       </div>
 
       {/* login form */}
