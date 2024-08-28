@@ -3,14 +3,23 @@ import { ActionFunction, LoaderFunction, redirect } from "@remix-run/node";
 import { Form } from "@remix-run/react";
 import TextInput from "~/components/inputs/text-input";
 import UserController from "~/controllers/UserController";
+import banner from "~/assets/images/login-banner.jpeg";
 
 export default function Login() {
   return (
     <div className="grid grid-cols-2 h-screen">
-      <div className=""></div>
+      <div className="flex items-center justify-center">
+        <img src={banner} className="h-[100vh] object-cover" alt="" />
+      </div>
 
       {/* login form */}
       <div className="h-full flex flex-col gap-5 items-center justify-center">
+        <h2 className="text-3xl font-semibold baskervville-sc-regular">
+          Advanced Employee Manaement System
+        </h2>
+        <h2 className="text-3xl font-semibold mb-28 baskervville-sc-regular">
+          (AEMS)
+        </h2>
         <h1 className="font-montserrat font-bold text-lg">
           Sign In To Your Account
         </h1>

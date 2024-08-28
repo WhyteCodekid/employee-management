@@ -24,4 +24,16 @@ export default class LeaveController {
 
     return { pendingLeaves, approvedLeaves, rejectedLeaves, totalUsers };
   };
+
+  public getAdminDashboardData = async () => {
+    const [pendingLeaves, approvedLeaves, rejectedLeaves, totalUsers] =
+      await Promise.all([
+        Leave.countDocuments({ status: "pending" }),
+        Leave.countDocuments({ status: "approved" }),
+        Leave.countDocuments({ status: "rejected" }),
+        User.countDocuments(),
+      ]);
+
+    return { pendingLeaves, approvedLeaves, rejectedLeaves, totalUsers };
+  };
 }
