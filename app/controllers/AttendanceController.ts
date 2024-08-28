@@ -104,6 +104,57 @@ export default class AttendanceController {
     }
   }
 
+  public async getMyAttendances({
+    page,
+    month,
+    limit = 10,
+  }: {
+    page: number;
+    month?: string;
+    limit?: number;
+  }): Promise<
+    { attendances: AttendanceInterface[]; totalPages: number } | any
+  > {
+    const session = await getFlashSession(this.request.headers.get("Cookie"));
+    const skipCount = (page - 1) * limit;
+
+    const userController = new UserController(this.request);
+    const userId = await userController.getUserId();
+
+    try {
+      const attendances = await Attendance.find({
+        user: userId,
+      })
+        .skip(skipCount)
+        .limit(limit)
+        .sort({
+          createdAt: "desc",
+        })
+        .exec();
+
+      const totalAttendancesCount = await Attendance.countDocuments({
+        user: userId,
+      }).exec();
+      const totalPages = Math.ceil(totalAttendancesCount / limit);
+
+      return { attendances, totalPages };
+    } catch (error) {
+      console.log(error);
+      session.flash("message", {
+        title: "Error!",
+        status: "error",
+        message: "Error retrieving attendances",
+      });
+
+      return redirect(this.path, {
+        headers: {
+          "Set-Cookie": await commitFlashSession(session),
+        },
+      });
+      // throw new Error("Error retrieving attendances");
+    }
+  }
+
   /**
    * Retrieve a single Attendance
    * @param id string
