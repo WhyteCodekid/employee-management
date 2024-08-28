@@ -18,7 +18,6 @@ export const UsersCombobox = () => {
   const fetcher = async (url: string) => {
     try {
       const response = await axios.get(url);
-      console.log(response.data);
 
       return response.data;
     } catch (error: any) {
@@ -32,12 +31,12 @@ export const UsersCombobox = () => {
 
   return (
     <>
+      <input name="user" className="hidden" value={value} />
       <Autocomplete
         color="primary"
         labelPlacement="outside"
         label="Select Employee"
         placeholder=" "
-        name="user"
         variant="bordered"
         inputProps={{
           classNames: {

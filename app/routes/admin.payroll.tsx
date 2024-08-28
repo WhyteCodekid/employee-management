@@ -38,10 +38,10 @@ export default function AdminEmployeesManagement() {
 
   // edit user stuff
   const editDisclosure = useDisclosure();
-  const [faq, setFaq] = useState<FaqInterface | null>(null);
+  const [transaction, setTransaction] = useState<any | null>(null);
   useEffect(() => {
     if (!editDisclosure.isOpen) {
-      setFaq(null);
+      setTransaction(null);
     }
   }, [editDisclosure.onOpenChange]);
 
@@ -92,7 +92,9 @@ export default function AdminEmployeesManagement() {
         >
           {deductionBonus?.map((transaction: any, index: number) => (
             <TableRow key={index}>
-              <TableCell>{moment(transaction.createdAt).date()}</TableCell>
+              <TableCell>
+                {moment(transaction.createdAt).format("DD-MMM-YYYY")}
+              </TableCell>
               <TableCell>{transaction.user?.firstName}</TableCell>
               <TableCell>{transaction.type}</TableCell>
               <TableCell>{transaction.amount}</TableCell>
@@ -102,7 +104,7 @@ export default function AdminEmployeesManagement() {
                   color="primary"
                   size="sm"
                   onPress={() => {
-                    // setFaq(faq);
+                    setTransaction(transaction);
                     editDisclosure.onOpen();
                   }}
                 >
@@ -135,32 +137,32 @@ export default function AdminEmployeesManagement() {
       >
         <div className="flex flex-col gap-5">
           <TextInput
-            label="Faq ID"
+            label="Select Employee"
             name="id"
-            value={faq?._id}
+            value={transaction?.user?._id}
             className="hidden"
           />
           <TextInput
             label="Question"
             name="question"
-            value={faq?.question}
-            onValueChange={(value) =>
-              setFaq((prev: any) => ({
-                ...prev,
-                question: value as string,
-              }))
-            }
+            value={transaction?.amount}
+            // onValueChange={(value) =>
+            //   setFaq((prev: any) => ({
+            //     ...prev,
+            //     question: value as string,
+            //   }))
+            // }
           />
           <TextareaInput
             label="Answer"
-            name="answer"
-            value={faq?.answer}
-            onValueChange={(value) =>
-              setFaq((prev: any) => ({
-                ...prev,
-                answer: value as string,
-              }))
-            }
+            // name="answer"
+            // value={faq?.answer}
+            // onValueChange={(value) =>
+            //   setFaq((prev: any) => ({
+            //     ...prev,
+            //     answer: value as string,
+            //   }))
+            // }
           />
         </div>
       </EditRecordModal>
