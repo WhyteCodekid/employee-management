@@ -11,6 +11,7 @@ export default function SearchAndCreateRecordBar({
   searchValue,
   pageValue,
   flashMessage,
+  hideButton = false,
 }: {
   buttonText?: string;
   children: ReactNode;
@@ -19,6 +20,7 @@ export default function SearchAndCreateRecordBar({
   searchValue?: string;
   pageValue?: number;
   flashMessage: { message: string; status: "error" | "success" };
+  hideButton?: boolean;
 }) {
   const createRecordDisclosure = useDisclosure();
   const navigate = useNavigate();
@@ -46,13 +48,15 @@ export default function SearchAndCreateRecordBar({
         aria-labelledby="search input"
       />
 
-      <Button
-        color="success"
-        onPress={() => createRecordDisclosure.onOpen()}
-        className="font-montserrat text-white font-semibold"
-      >
-        {buttonText}
-      </Button>
+      {!hideButton && (
+        <Button
+          color="success"
+          onPress={() => createRecordDisclosure.onOpen()}
+          className="font-montserrat text-white font-semibold"
+        >
+          {buttonText}
+        </Button>
+      )}
 
       <CreateRecordModal
         isOpen={createRecordDisclosure.isOpen}

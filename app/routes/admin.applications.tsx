@@ -3,7 +3,6 @@ import {
   SelectItem,
   TableCell,
   TableRow,
-  Textarea,
   useDisclosure,
 } from "@nextui-org/react";
 import { ActionFunction, LoaderFunction } from "@remix-run/node";
@@ -54,24 +53,25 @@ export default function AvaibleJobs() {
 
   return (
     <div>
-      <Header title="Manage Jobs" />
+      <Header title="Applications" />
 
       <SearchAndCreateRecordBar
-        buttonText="New Job"
-        modalTitle="New Job"
+        hideButton
+        // buttonText="New Transaction"
+        // modalTitle="Add Job"
         searchValue={search_term}
         pageValue={page}
-        formIntent="create"
+        // formIntent="new-transaction"
         flashMessage={flashMessage}
       >
-        <div className="flex flex-col gap-5">
-          <TextInput label="Title" name="title" isRequired />
-          <TextareaInput label="Description" name="description" isRequired />
-          <CustomSelect label="Status" name="type">
+        {/* <div className="flex flex-col gap-5">
+          <UsersCombobox />
+          <TextInput label="Amount" name="amount" isRequired />
+          <CustomSelect label="Transaction Type" name="type">
             <SelectItem key={"bonus"}>Bonus</SelectItem>
             <SelectItem key={"deduction"}>Deductions</SelectItem>
           </CustomSelect>
-        </div>
+        </div> */}
       </SearchAndCreateRecordBar>
 
       <div className="px-4">
@@ -188,14 +188,14 @@ export const action: ActionFunction = async ({ request }) => {
 
   const faqController = new FaqController(request);
   const payrollController = new PayrollController(request);
-  if (formValues.intent === "crate") {
+  if (formValues.intent === "new-transaction") {
     return payrollController.createDeductionBonus({
       user: formValues.user as string,
       type: formValues.type as string,
       amount: formValues.amount as string,
     });
   }
-  if (formValues.intent === "update") {
+  if (formValues.intent === "update-faq") {
     return faqController.updateFaq({
       id: formValues.id as string,
       question: formValues.question as string,
