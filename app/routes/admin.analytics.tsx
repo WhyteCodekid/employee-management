@@ -7,11 +7,6 @@ export default function AdminAnalytics() {
     <div>
       <Header title="Analytics" />
 
-      <div className="flex gap-5 mx-5">
-        <NavLink to="/admin/analytics">Top nav</NavLink>
-        <NavLink to="/admin/analytics/">Top nav</NavLink>
-      </div>
-
       <Outlet />
     </div>
   );
