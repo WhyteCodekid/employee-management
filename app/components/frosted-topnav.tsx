@@ -1,17 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@nextui-org/react";
-import {
-  FacebookAnimated,
-  InstagramAnimated,
-  TwitterAnimated,
-} from "../icons/social-media";
-import { Link } from "@remix-run/react";
+// import {
+//   FacebookAnimated,
+//   InstagramAnimated,
+//   TwitterAnimated,
+// } from "../icons/social-media";
+import { Link, useNavigate } from "@remix-run/react";
 
 export default function FrostedNavbar() {
+  const navigate = useNavigate();
   // nav handler
   const [scrolled, setScrolled] = useState(false);
   const [navIsOpen, setNavIsOpen] = useState(false);
-
   const mobileNavRef = useRef(null);
 
   useEffect(() => {
@@ -48,18 +48,15 @@ export default function FrostedNavbar() {
   return (
     <>
       <div
-        className={`sticky max-w-6xl xl:max-w-[100rem] mx-auto ${
+        className={`sticky max-w-6xl xl:max-w-[100rem] mx-auto  ${
           scrolled
-            ? "top-2 backdrop-blur-lg bg-cyan-400/15 sticky mx-2 2xl:mx-0"
+            ? "top-2 backdrop-blur-lg bg-slate-700/90 sticky mx-11 2xl:mx-0"
             : "top-0"
-        } transition-all duration-400 h-14 md:h-20 rounded-2xl md:rounded-3xl z-50 flex items-center justify-between px-4`}
+        } transition-all duration-400 h-14 md:h-20 rounded-3xl md:rounded-3xl z-50 flex items-center justify-between px-4`}
       >
         {/* logo */}
-        <Link to="/" className="flex items-center gap-2">
-          <img
-            src="https://assets-global.website-files.com/65e0baa4c574875c0d348044/65e24a17888b5c95a19354f2_logo-studio-records-white.svg"
-            className="h-6 md:h-8"
-          />
+        <Link to="/" className="flex items-center gap-2 font-bold">
+          ADMS
         </Link>
 
         {/* navlinks */}
@@ -77,7 +74,7 @@ export default function FrostedNavbar() {
             width="1em"
             height="1em"
             viewBox="0 0 24 24"
-            className="size-8 text-white"
+            className="size-8 text-black"
           >
             <path
               fill="none"
@@ -90,17 +87,18 @@ export default function FrostedNavbar() {
           </svg>
         </Button>
         <div className="lg:flex items-center gap-4 hidden">
-          <FacebookAnimated className="size-5 text-white" />
+          {/* <FacebookAnimated className="size-5 text-white" />
           <TwitterAnimated className="size-5 text-white" />
-          <InstagramAnimated className="size-5 text-white" />
+          <InstagramAnimated className="size-5 text-white" /> */}
           <Button
             size="sm"
             color="primary"
             radius="full"
             variant="solid"
             className="bg-cyan-400 text-slate-950 font-semibold font-montserrat"
+            onClick={() => navigate("/login")}
           >
-            Contact Us
+            Login
           </Button>
         </div>
       </div>
@@ -125,9 +123,9 @@ export default function FrostedNavbar() {
         <div className="flex flex-col gap-6"></div>
 
         <div className="flex items-center gap-5 px-5">
-          <FacebookAnimated className="size-5 text-white" />
+          {/* <FacebookAnimated className="size-5 text-white" />
           <TwitterAnimated className="size-5 text-white" />
-          <InstagramAnimated className="size-6 text-white" />
+          <InstagramAnimated className="size-6 text-white" /> */}
         </div>
       </aside>
     </>
