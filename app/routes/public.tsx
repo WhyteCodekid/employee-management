@@ -55,7 +55,7 @@ export default function Public() {
         </Form>
       </section>
 
-      <section className="px-11 grid grid-cols-4 gap-5 mt-11" id="listings">
+      <section className="px-11 grid grid-cols-4 gap-5 my-11" id="listings">
         {jobs?.map((job) => (
           <div
             key={job?._id}

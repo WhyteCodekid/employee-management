@@ -1,7 +1,7 @@
 import Leave from "~/models/Leave";
 import User from "~/models/User";
 
-export default class LeaveController {
+export default class DashboardController {
   private request: Request;
   private path: string;
 

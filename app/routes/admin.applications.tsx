@@ -165,7 +165,6 @@ export const loader: LoaderFunction = async ({ request }) => {
   const page = parseInt(url.searchParams.get("page") || "1");
 
   const jobCtrl = new JobController(request);
-
   const { applications } = await jobCtrl.getApplications();
 
   return {
