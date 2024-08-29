@@ -37,20 +37,22 @@ export default function Public() {
           Openings
         </p>
 
-        <div className="flex gap-3 items-center">
+        <Form method="GET" className="flex gap-3 items-center">
           <input
             type="text"
-            className="outline-none bg-white px-9 p-3 rounded-3xl w-96 border"
+            className="outline-none bg-white dark:bg-slate-900 px-9 p-3 rounded-3xl w-96 border"
             placeholder="Search for jobs..."
+            name="search_term"
           />
           <Button
             className="bg-black text-white p-3 rounded-3xl"
             size="lg"
             href="#listings"
+            type="submit"
           >
             Search
           </Button>
-        </div>
+        </Form>
       </section>
 
       <section className="px-11 grid grid-cols-4 gap-5 mt-11" id="listings">
