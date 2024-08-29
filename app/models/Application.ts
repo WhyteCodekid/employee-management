@@ -4,15 +4,16 @@ import { ApplicationInterface } from "~/utils/types";
 
 const schema = new Schema<ApplicationInterface>(
   {
-    firstName: {
+    job: {
+      type: Schema.Types.ObjectId,
+      ref: "jobs",
+      required: true,
+    },
+    fullName: {
       type: String,
       required: true,
     },
-    lastName: {
-      type: String,
-      required: true,
-    },
-    emailName: {
+    email: {
       type: String,
     },
     gender: {

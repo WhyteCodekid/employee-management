@@ -6,6 +6,7 @@ import { Button } from "@nextui-org/react";
 //   TwitterAnimated,
 // } from "../icons/social-media";
 import { Link, useNavigate } from "@remix-run/react";
+import ThemeSwitcher from "./ui/theme-switcher";
 
 export default function FrostedNavbar() {
   const navigate = useNavigate();
@@ -56,7 +57,7 @@ export default function FrostedNavbar() {
       >
         {/* logo */}
         <Link to="/" className="flex items-center gap-2 font-bold">
-          ADMS
+          AEMS
         </Link>
 
         {/* navlinks */}
@@ -90,6 +91,8 @@ export default function FrostedNavbar() {
           {/* <FacebookAnimated className="size-5 text-white" />
           <TwitterAnimated className="size-5 text-white" />
           <InstagramAnimated className="size-5 text-white" /> */}
+
+          <ThemeSwitcher />
           <Button
             size="sm"
             color="primary"
