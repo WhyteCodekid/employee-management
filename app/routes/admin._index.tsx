@@ -1,4 +1,4 @@
-import { Card, CardHeader } from "@nextui-org/react";
+import { Button, Card } from "@nextui-org/react";
 import { useLoaderData } from "@remix-run/react";
 import moment from "moment";
 import { LoaderFunction } from "react-router";
@@ -17,7 +17,6 @@ import {
   AreaChart,
   Area,
 } from "recharts";
-import React, { PureComponent } from "react";
 
 const chartData = [
   {
@@ -66,7 +65,6 @@ const chartData = [
 
 export default function AdminDashboard() {
   const { data, applications } = useLoaderData();
-  console.log(data);
 
   return (
     <div className="flex flex-col gap-5 h-full">
@@ -95,7 +93,7 @@ export default function AdminDashboard() {
       </section>
 
       <section className="flex gap-3 mx-5">
-        <Card className="w-[65%] h-[70vh] dark:bg-slate-800 rounded-xl p-4">
+        <Card className="w-[65%] h-[65vh] dark:bg-slate-800 rounded-xl p-4">
           <p>Statistics</p>
 
           <ResponsiveContainer width="100%" height="100%">

@@ -32,13 +32,13 @@ const CustomTable = ({
   const navigation = useNavigation();
 
   return (
-    <div className="h-full w-full flex flex-col gap-1">
+    <div className="w-full flex flex-col gap-1">
       <Table
         aria-label="data table"
         classNames={{
           base: `${
-            customHeightClass ? customHeightClass : "md:!h-[78vh]"
-          } h-[65vh] overflow-y-auto w-screen md:w-full overflow-x-auto  shadow-none`,
+            customHeightClass ? customHeightClass : ""
+          }  overflow-y-auto w-screen md:w-full overflow-x-auto  shadow-none`,
           wrapper:
             "vertical-scrollbar horizontal-scrollbar shadow-none rounded-2xl dark:border border-white/5",
           th: "",
