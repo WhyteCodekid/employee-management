@@ -27,7 +27,6 @@ import ThemeSwitcher from "~/components/ui/theme-switcher";
 import UserDropdown from "~/components/ui/user-dropdown";
 import FaqController from "~/controllers/FaqController";
 import LeaveController from "~/controllers/LeaveController";
-import PayrollController from "~/controllers/PayrollController";
 import UserController from "~/controllers/UserController";
 import { FaqInterface, LeaveInterface } from "~/utils/types";
 
@@ -36,9 +35,6 @@ const { useReactToPrint } = pkg;
 
 export default function AdminLayout() {
   const navigate = useNavigate();
-  const { flashMessage } = useOutletContext<{
-    flashMessage: { title: string; status: "error" | "success" };
-  }>();
   const { user, search_term, page, leaves, totalPages, faqs } =
     useLoaderData<typeof loader>();
 
@@ -78,7 +74,7 @@ export default function AdminLayout() {
   return (
     <div className="min-h-screen pb-6 flex flex-col gap-5 bg-slate-300/30 dark:bg-content1">
       {/* top nav */}
-      <div className="h-16 bg-white px-4 dark:bg-content2 flex items-center justify-between sticky top-0 z-50">
+      <div className="h-16 bg-white px-4 dark:bg-content2 flex items-center justify-between">
         <h1 className="font-montserrat font-bold text-lg">
           Staff Interface | AEMS
         </h1>
@@ -160,7 +156,7 @@ export default function AdminLayout() {
           <div className="rounded-3xl bg-white dark:bg-content2 px-4 py-4 flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <h2 className="font-montserrat font-semibold text-lg">
-                Financial History
+                Reimbursements
               </h2>
 
               <Button
@@ -178,43 +174,6 @@ export default function AdminLayout() {
                   : "Generate Payslip"}
               </Button>
             </div>
-
-            {/* leaves table */}
-            <CustomTable
-              columns={["Date", "Amount", "Transaction Type"]}
-              page={page}
-              setPage={(page) =>
-                navigate(`?page=${page}&search_term=${search_term}`)
-              }
-              totalPages={totalPages}
-              customHeightClass="h-full"
-            >
-              {deductionBonus?.map((transaction: any, index: number) => (
-                <TableRow key={index}>
-                  <TableCell>
-                    {moment(transaction.createdAt).format("DD/MM/YYYY")}
-                  </TableCell>
-                  <TableCell className="capitalize">
-                    {transaction.type} leave
-                  </TableCell>
-                  <TableCell>
-                    {moment(transaction.amount).format("DD/MM/YYYY")}
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      size="sm"
-                      className="font-quicksand font-semibold capitalize"
-                      variant="flat"
-                      color={`${
-                        transaction.type === "bonus" ? "success" : "danger"
-                      }`}
-                    >
-                      {transaction.type}
-                    </Chip>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </CustomTable>
           </div>
 
           {/* leave applications */}
@@ -484,12 +443,5 @@ export const loader: LoaderFunction = async ({ request }) => {
     limit: 8,
   });
 
-  const payrollController = new PayrollController(request);
-  const { deductionBonus } = await payrollController.getUserPayrollHistory({
-    page,
-    limit: 15,
-    month: new Date().toLocaleDateString(),
-  });
-
-  return { user, search_term, page, leaves, totalPages, faqs, deductionBonus };
+  return { user, search_term, page, leaves, totalPages, faqs };
 };

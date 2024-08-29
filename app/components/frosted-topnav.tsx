@@ -48,9 +48,9 @@ export default function FrostedNavbar() {
   return (
     <>
       <div
-        className={`sticky max-w-6xl xl:max-w-[100rem] mx-auto  ${
+        className={`sticky xl:max-w-[100rem] mx-auto  ${
           scrolled
-            ? "top-2 backdrop-blur-lg bg-slate-700/90 sticky mx-11 2xl:mx-0"
+            ? "top-2 backdrop-blur-lg bg-slate-700/90 sticky mx-11 2xl:mx-11"
             : "top-0"
         } transition-all duration-400 h-14 md:h-20 rounded-3xl md:rounded-3xl z-50 flex items-center justify-between px-4`}
       >

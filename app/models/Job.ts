@@ -4,12 +4,20 @@ import { JobInterface } from "~/utils/types";
 
 const schema = new Schema<JobInterface>(
   {
-    question: {
+    title: {
       type: String,
       required: true,
     },
-    answer: {
+    description: {
       type: String,
+      required: true,
+    },
+    commitment: {
+      type: String,
+      enum: ["full-time", "part-time", "contract", "internship"],
+    },
+    salary: {
+      type: Number,
       required: true,
     },
   },
