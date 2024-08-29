@@ -4,29 +4,35 @@ import {
   Button,
   Chip,
   DatePicker,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
   SelectItem,
   TableCell,
   TableRow,
   useDisclosure,
 } from "@nextui-org/react";
 import { ActionFunction, LoaderFunction } from "@remix-run/node";
-import {
-  Outlet,
-  useLoaderData,
-  useNavigate,
-  useOutletContext,
-} from "@remix-run/react";
+import { useLoaderData, useNavigate, useOutletContext } from "@remix-run/react";
+import axios from "axios";
 import moment from "moment";
+import { useEffect, useRef, useState } from "react";
 import CustomSelect from "~/components/inputs/select";
 import TextareaInput from "~/components/inputs/textarea";
 import CreateRecordModal from "~/components/modals/CreateRecord";
 import CustomTable from "~/components/ui/new-table";
-import Sidebar, { StaffSidebar } from "~/components/ui/sidebar";
 import ThemeSwitcher from "~/components/ui/theme-switcher";
+import UserDropdown from "~/components/ui/user-dropdown";
 import FaqController from "~/controllers/FaqController";
 import LeaveController from "~/controllers/LeaveController";
+import PayrollController from "~/controllers/PayrollController";
 import UserController from "~/controllers/UserController";
 import { FaqInterface, LeaveInterface } from "~/utils/types";
+
+import pkg from "react-to-print";
+const { useReactToPrint } = pkg;
 
 export default function AdminLayout() {
   const navigate = useNavigate();
@@ -35,28 +41,71 @@ export default function AdminLayout() {
   }>();
   const { user, search_term, page, leaves, totalPages, faqs } =
     useLoaderData<typeof loader>();
-  console.log(user);
+
+  const [payslipLoading, setPayslipLoading] = useState(false);
+  const [payslipHistory, setPayslipHistory] = useState([]);
+  const [totalAmount, setTotalAmount] = useState(0);
 
   const requestLeaveDisclosure = useDisclosure();
+  const payslipDisclosure = useDisclosure();
+
+  const componentRef = useRef();
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+  });
+
+  const attendanceComponentRef = useRef();
+  const handleAttendancePrint = useReactToPrint({
+    content: () => attendanceComponentRef.current,
+  });
+
+  const generatePayslip = async () => {
+    await axios.get("/api/generate-payslip").then((response) => {
+      console.log(response.data);
+      setPayslipHistory(response?.data?.deductionBonuses);
+      setTotalAmount(response?.data?.totalSalary);
+      setTimeout(() => {
+        setPayslipLoading(false);
+        payslipDisclosure.onOpen();
+      }, 5000);
+    });
+  };
+
+  useEffect(() => {
+    requestLeaveDisclosure.onClose();
+  }, [leaves]);
 
   return (
     <div className="min-h-screen pb-6 flex flex-col gap-5 bg-slate-300/30 dark:bg-content1">
       {/* top nav */}
-      <div className="h-16 bg-white px-4 dark:bg-content2 flex items-center justify-between">
+      <div className="h-16 bg-white px-4 dark:bg-content2 flex items-center justify-between sticky top-0 z-50">
         <h1 className="font-montserrat font-bold text-lg">
           Staff Interface | AEMS
         </h1>
 
-        <ThemeSwitcher />
+        <div className="flex items-center gap-3">
+          <ThemeSwitcher />
+          <UserDropdown user={user} />
+        </div>
       </div>
 
       {/* page content */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 px-4 gap-x-10">
         <div className="grid grid-cols-1">
           <div className="rounded-3xl bg-white dark:bg-content2 px-4 py-4 flex flex-col gap-3">
-            <h2 className="font-montserrat font-semibold text-lg">
-              My Profile
-            </h2>
+            <div className="flex items-center justify-between">
+              <h2 className="font-montserrat font-semibold text-lg">
+                My Profile
+              </h2>
+
+              <Button
+                size="sm"
+                color="success"
+                className="font-montserrat text-white"
+              >
+                Edit Profile
+              </Button>
+            </div>
 
             <div className="flex items-start gap-4">
               <div className="rounded-full border-2 border-green-500 size-20 overflow-hidden">
@@ -70,6 +119,7 @@ export default function AdminLayout() {
                 <h3 className="font-montserrat text-2xl font-medium">
                   {user?.firstName} {user?.lastName}
                 </h3>
+                <p> {user?.email}</p>
               </div>
             </div>
           </div>
@@ -110,17 +160,61 @@ export default function AdminLayout() {
           <div className="rounded-3xl bg-white dark:bg-content2 px-4 py-4 flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <h2 className="font-montserrat font-semibold text-lg">
-                Reimbursements
+                Financial History
               </h2>
 
               <Button
                 size="sm"
                 color="success"
                 className="font-montserrat text-white"
+                isLoading={payslipLoading}
+                onClick={() => {
+                  setPayslipLoading(true);
+                  generatePayslip();
+                }}
               >
-                Generate Payslip
+                {payslipLoading
+                  ? "AI is generating Payslip"
+                  : "Generate Payslip"}
               </Button>
             </div>
+
+            {/* leaves table */}
+            <CustomTable
+              columns={["Date", "Amount", "Transaction Type"]}
+              page={page}
+              setPage={(page) =>
+                navigate(`?page=${page}&search_term=${search_term}`)
+              }
+              totalPages={totalPages}
+              customHeightClass="h-full"
+            >
+              {deductionBonus?.map((transaction: any, index: number) => (
+                <TableRow key={index}>
+                  <TableCell>
+                    {moment(transaction.createdAt).format("DD/MM/YYYY")}
+                  </TableCell>
+                  <TableCell className="capitalize">
+                    {transaction.type} leave
+                  </TableCell>
+                  <TableCell>
+                    {moment(transaction.amount).format("DD/MM/YYYY")}
+                  </TableCell>
+                  <TableCell>
+                    <Chip
+                      size="sm"
+                      className="font-quicksand font-semibold capitalize"
+                      variant="flat"
+                      color={`${
+                        transaction.type === "bonus" ? "success" : "danger"
+                      }`}
+                    >
+                      {transaction.type}
+                    </Chip>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </CustomTable>
           </div>
 
           {/* leave applications */}
@@ -130,57 +224,84 @@ export default function AdminLayout() {
                 Leave Applications
               </h2>
 
-              <Button
-                size="sm"
-                color="success"
-                className="font-montserrat text-white"
-                onPress={() => requestLeaveDisclosure.onOpen()}
-              >
-                Request Leave
-              </Button>
+              <div className="flex items-center gap-3">
+                <Button
+                  color="warning"
+                  size="sm"
+                  className="font-montserrat text-white"
+                  onPress={() => {
+                    handleAttendancePrint();
+                  }}
+                >
+                  Print history
+                </Button>
+
+                <Button
+                  size="sm"
+                  color="success"
+                  className="font-montserrat text-white"
+                  onPress={() => requestLeaveDisclosure.onOpen()}
+                >
+                  Request Leave
+                </Button>
+              </div>
             </div>
 
             {/* leaves table */}
-            <CustomTable
-              columns={["Type", "Start Date", "End Date", "Status", "Reason"]}
-              page={page}
-              setPage={(page) =>
-                navigate(`?page=${page}&search_term=${search_term}`)
-              }
-              totalPages={totalPages}
-              customHeightClass="h-full"
-            >
-              {leaves?.map((leave: LeaveInterface, index: number) => (
-                <TableRow key={index}>
-                  <TableCell className="capitalize">
-                    {leave.type} leave
-                  </TableCell>
-                  <TableCell>
-                    {moment(leave.startDate).format("DD/MM/YYYY")}
-                  </TableCell>
-                  <TableCell>
-                    {moment(leave.endDate).format("DD/MM/YYYY")}
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      size="sm"
-                      className="font-quicksand font-semibold capitalize"
-                      variant="flat"
-                      color={`${
-                        leave.status === "pending"
-                          ? "warning"
-                          : leave.status === "approved"
-                          ? "success"
-                          : "danger"
-                      }`}
-                    >
-                      {leave.status}
-                    </Chip>
-                  </TableCell>
-                  <TableCell>{leave.reason}</TableCell>
-                </TableRow>
-              ))}
-            </CustomTable>
+            <div ref={attendanceComponentRef}>
+              <div className="flex-col px-5 gap-1 hidden print:flex ">
+                <h3 className="font-montserrat text-2xl font-medium">
+                  {user?.firstName} {user?.lastName}
+                </h3>
+                <p>Email: {user?.email}</p>
+                <p>Staff ID: {user?.staffId}</p>
+
+                <div>
+                  <p className="font-semibold text-lg">Attendance History</p>
+                </div>
+              </div>
+
+              <CustomTable
+                columns={["Type", "Start Date", "End Date", "Status", "Reason"]}
+                page={page}
+                setPage={(page) =>
+                  navigate(`?page=${page}&search_term=${search_term}`)
+                }
+                totalPages={totalPages}
+                customHeightClass="h-full"
+              >
+                {leaves?.map((leave: LeaveInterface, index: number) => (
+                  <TableRow key={index}>
+                    <TableCell className="capitalize">
+                      {leave.type} leave
+                    </TableCell>
+                    <TableCell>
+                      {moment(leave.startDate).format("DD/MM/YYYY")}
+                    </TableCell>
+                    <TableCell>
+                      {moment(leave.endDate).format("DD/MM/YYYY")}
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        size="sm"
+                        className="font-quicksand font-semibold capitalize"
+                        variant="flat"
+                        color={`${
+                          leave.status === "pending"
+                            ? "warning"
+                            : leave.status === "approved"
+                            ? "success"
+                            : "danger"
+                        }`}
+                      >
+                        {leave.status}
+                      </Chip>
+                    </TableCell>
+                    <TableCell>{leave.reason}</TableCell>
+                  </TableRow>
+                ))}
+              </CustomTable>
+            </div>
           </div>
         </div>
       </div>
@@ -235,6 +356,79 @@ export default function AdminLayout() {
           <TextareaInput label="Reason" name="reason" />
         </div>
       </CreateRecordModal>
+
+      <Modal
+        isOpen={payslipDisclosure.isOpen}
+        onOpenChange={payslipDisclosure.onOpenChange}
+        isDismissable={false}
+        isKeyboardDismissDisabled={true}
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Payslip History
+              </ModalHeader>
+              <ModalBody ref={componentRef}>
+                <div className="flex flex-col gap-1 hidden print:flex ">
+                  <h3 className="font-montserrat text-2xl font-medium">
+                    {user?.firstName} {user?.lastName}
+                  </h3>
+                  <p>Email: {user?.email}</p>
+                  <p>Staff ID: {user?.staffId}</p>
+
+                  <div>
+                    <p className="font-semibold text-lg">Your Pay slip</p>
+                    <p>Total Amount: GH₵ {totalAmount}</p>
+                  </div>
+                </div>
+
+                <CustomTable
+                  columns={["Date", "Amount", "Transaction Type"]}
+                  page={page}
+                  setPage={(page) =>
+                    navigate(`?page=${page}&search_term=${search_term}`)
+                  }
+                  totalPages={totalPages}
+                >
+                  {payslipHistory?.map((transaction: any, index: number) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        {moment(transaction.createdAt).format("Do MMMM, YYYY")}
+                      </TableCell>
+                      <TableCell>{transaction.amount}</TableCell>
+                      <TableCell className="capitalize">
+                        {transaction.type}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </CustomTable>
+              </ModalBody>
+              <ModalFooter>
+                <Button
+                  size="sm"
+                  color="danger"
+                  variant="faded"
+                  onPress={onClose}
+                >
+                  Close
+                </Button>
+                <Button
+                  color="warning"
+                  size="sm"
+                  className="font-montserrat text-white"
+                  onPress={() => {
+                    handlePrint();
+                    onClose();
+                  }}
+                >
+                  Print Pay slip
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 }
@@ -290,5 +484,12 @@ export const loader: LoaderFunction = async ({ request }) => {
     limit: 8,
   });
 
-  return { user, search_term, page, leaves, totalPages, faqs };
+  const payrollController = new PayrollController(request);
+  const { deductionBonus } = await payrollController.getUserPayrollHistory({
+    page,
+    limit: 15,
+    month: new Date().toLocaleDateString(),
+  });
+
+  return { user, search_term, page, leaves, totalPages, faqs, deductionBonus };
 };

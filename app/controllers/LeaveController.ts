@@ -211,7 +211,7 @@ export default class LeaveController {
         title: "Leave requested!",
         status: "success",
       });
-      return redirect("/admin/faqs", {
+      return redirect(this.path, {
         headers: {
           "Set-Cookie": await commitFlashSession(session),
         },
@@ -222,7 +222,7 @@ export default class LeaveController {
         title: "Something went wrong!",
         status: "error",
       });
-      return redirect("/admin/faqs", {
+      return redirect(this.path, {
         headers: {
           "Set-Cookie": await commitFlashSession(session),
         },

@@ -342,13 +342,13 @@ export default class PayrollController {
     month,
     year,
   }: {
-    month: string;
-    year: string;
+    month?: string;
+    year?: string;
   }) => {
     const session = await getFlashSession(this.request.headers.get("Cookie"));
 
     try {
-      const user = await new UserController(this.request).getUserId();
+      const user = await new UserController(this.request).getUser();
 
       //  calculate total salary from the deductions and bonuses
       const deductions = await DeductionBonus.find({
@@ -373,18 +373,14 @@ export default class PayrollController {
       });
 
       const totalSalary = user?.baseSalary + totalBonuses - totalDeductions;
+      console.log({ deductions, bonuses });
 
-      // //  create payslip
-      // const payslip = await Payslip.create({
-      //   user,
-      //   month,
-      //   year,
-      //   totalSalary,
-      //   totalDeductions,
-      //   totalBonuses,
-      // });
+      // history
+      const deductionBonuses = await DeductionBonus.find({
+        user: user?._id,
+      });
 
-      return totalSalary;
+      return { totalSalary, deductionBonuses };
     } catch (error) {
       console.log(error);
       session.flash("message", {

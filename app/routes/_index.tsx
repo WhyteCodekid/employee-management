@@ -20,7 +20,7 @@ export default function SplashScreen() {
       //  } else {
       //    navigate(`/${storedValue.user.role}`);
       //  }
-      navigate("/admin");
+      navigate("/public");
     };
 
     const timeoutId = setTimeout(fetchUser, 500);
