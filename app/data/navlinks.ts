@@ -5,7 +5,7 @@ export const adminNavLinks = [
   { icon: "", label: "Attendance", path: "/admin/attendance" },
   { icon: "", label: "Leaves", path: "/admin/leaves" },
   { icon: "", label: "Payroll", path: "/admin/payroll" },
-  { icon: "", label: "Available Jobs", path: "/admin/available-jobs" },
+  { icon: "", label: "Available Jobs", path: "/admin/jobs" },
   { icon: "", label: "Applications", path: "/admin/applications" },
   { icon: "", label: "FAQs", path: "/admin/faqs" },
   { icon: "", label: "Analytics", path: "/admin/analytics" },

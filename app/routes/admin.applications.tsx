@@ -20,13 +20,14 @@ import { UsersCombobox } from "~/components/inputs/combobox";
 import PayrollController from "~/controllers/PayrollController";
 import CustomSelect from "~/components/inputs/select";
 import moment from "moment";
+import JobController from "~/controllers/JobController";
 
 export default function AvaibleJobs() {
   const flashMessage = useOutletContext<{
     message: string;
     status: "error" | "success";
   }>();
-  const { search_term, page, deductionBonus, totalPages } =
+  const { search_term, page, applications, totalPages } =
     useLoaderData<typeof loader>();
   const navigate = useNavigate();
 
@@ -77,26 +78,26 @@ export default function AvaibleJobs() {
       <div className="px-4">
         <CustomTable
           columns={[
-            "Date",
-            "Employee",
-            "Transaction Type",
-            "Amount",
+            "Applicant Name",
+            "Email",
+            "Position",
+            "Application Date",
             "Actions",
           ]}
           page={page}
           setPage={(page) =>
             navigate(`?page=${page}&search_term=${search_term}`)
           }
-          totalPages={totalPages}
+          totalPages={1}
         >
-          {deductionBonus?.map((transaction: any, index: number) => (
+          {applications?.map((transaction: any, index: number) => (
             <TableRow key={index}>
+              <TableCell>{transaction.fullName}</TableCell>
+              <TableCell>{transaction.email}</TableCell>
+              <TableCell>{transaction.job?.title}</TableCell>
               <TableCell>
-                {moment(transaction.createdAt).format("DD-MMM-YYYY")}
+                {moment(transaction.createdAt).format("Do MMMM, YYYY")}
               </TableCell>
-              <TableCell>{transaction.user?.firstName}</TableCell>
-              <TableCell>{transaction.type}</TableCell>
-              <TableCell>{transaction.amount}</TableCell>
               <TableCell className="flex items-center gap-2">
                 <Button
                   variant="flat"
@@ -109,62 +110,11 @@ export default function AvaibleJobs() {
                 >
                   Edit
                 </Button>
-                <Button
-                  variant="flat"
-                  color="danger"
-                  size="sm"
-                  onPress={() => {
-                    // setFaqId(faq._id);
-                    deleteDisclosure.onOpen();
-                  }}
-                >
-                  Delete
-                </Button>
               </TableCell>
             </TableRow>
           ))}
         </CustomTable>
       </div>
-
-      {/* edit user modal */}
-      <EditRecordModal
-        isModalOpen={editDisclosure.isOpen}
-        onCloseModal={editDisclosure.onClose}
-        title="Update Frequently Asked Question"
-        intent="update-faq"
-        size="lg"
-      >
-        <div className="flex flex-col gap-5">
-          <TextInput
-            label="Select Employee"
-            name="id"
-            value={transaction?.user?._id}
-            className="hidden"
-          />
-          <TextInput
-            label="Question"
-            name="question"
-            value={transaction?.amount}
-            // onValueChange={(value) =>
-            //   setFaq((prev: any) => ({
-            //     ...prev,
-            //     question: value as string,
-            //   }))
-            // }
-          />
-          <TextareaInput
-            label="Answer"
-            // name="answer"
-            // value={faq?.answer}
-            // onValueChange={(value) =>
-            //   setFaq((prev: any) => ({
-            //     ...prev,
-            //     answer: value as string,
-            //   }))
-            // }
-          />
-        </div>
-      </EditRecordModal>
 
       {/* delete user modal */}
       <DeleteRecordModal
@@ -214,19 +164,13 @@ export const loader: LoaderFunction = async ({ request }) => {
   const search_term = url.searchParams.get("search_term") || "";
   const page = parseInt(url.searchParams.get("page") || "1");
 
-  const payrollController = new PayrollController(request);
+  const jobCtrl = new JobController(request);
 
-  const { deductionBonus, totalPages } =
-    await payrollController.getDeductionBonuses({
-      page,
-      search_term,
-      limit: 15,
-    });
+  const { applications } = await jobCtrl.getApplications();
 
   return {
     search_term,
     page,
-    deductionBonus,
-    totalPages,
+    applications,
   };
 };
