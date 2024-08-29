@@ -34,7 +34,7 @@ export default function UserDropdown({
             description: "font-nunito text-gray-600 dark:text-gray-500",
           }}
           description={user?.email}
-          name={user?.name}
+          name={user?.firstName}
         />
       </DropdownTrigger>
       <DropdownMenu aria-label="User Actions" variant="flat">
