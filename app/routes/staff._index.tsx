@@ -81,7 +81,7 @@ export default function AdminLayout() {
 
         <div className="flex items-center gap-3">
           <ThemeSwitcher />
-          <UserDropdown user={user} />
+          <UserDropdown user={user} profilePath="/staff/profile" />
         </div>
       </div>
 
@@ -94,13 +94,13 @@ export default function AdminLayout() {
                 My Profile
               </h2>
 
-              <Button
+              {/* <Button
                 size="sm"
                 color="success"
                 className="font-montserrat text-white"
               >
                 Edit Profile
-              </Button>
+              </Button> */}
             </div>
 
             <div className="flex items-start gap-4">
