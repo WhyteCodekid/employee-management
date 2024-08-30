@@ -9,11 +9,13 @@ import { useNavigate } from "@remix-run/react";
 
 export default function UserDropdown({
   user,
+  profilePath = "/admin/profile",
 }: {
   user?: {
     name: string;
     email: string;
   };
+  profilePath: string;
 }) {
   const navigate = useNavigate();
 
@@ -38,7 +40,9 @@ export default function UserDropdown({
         />
       </DropdownTrigger>
       <DropdownMenu aria-label="User Actions" variant="flat">
-        <DropdownItem key="settings">Profile</DropdownItem>
+        <DropdownItem key="settings" onClick={() => navigate(profilePath)}>
+          Profile
+        </DropdownItem>
         <DropdownItem
           key="logout"
           color="danger"

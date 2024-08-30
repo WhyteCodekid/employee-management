@@ -4,6 +4,7 @@ import UserDropdown from "./user-dropdown";
 export default function Header({
   title,
   hideUserDropdown = false,
+  user = {},
 }: {
   title: string;
   hideUserDropdown?: boolean;
@@ -16,7 +17,7 @@ export default function Header({
       <div className="flex items-center gap-2">
         <ThemeSwitcher />
 
-        {!hideUserDropdown && <UserDropdown />}
+        {!hideUserDropdown && <UserDropdown user={user} />}
       </div>
     </div>
   );

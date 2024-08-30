@@ -14,14 +14,18 @@ import { commitFlashSession, getFlashSession } from "~/utils/flash-session";
 export default class UserController {
   private request: Request;
   private storage: SessionStorage;
-
+  private path: string;
   /**
    * Initialize a UserController instance
    * @param request This Fetch API interface represents a resource request.
    * @returns this
    */
   constructor(request: Request) {
+    const url = new URL(request.url);
+    const path = url.pathname + url.search;
+
     this.request = request;
+    this.path = path;
 
     const secret = process.env.SESSION_SECRET;
     if (!secret) {
@@ -261,7 +265,7 @@ export default class UserController {
         title: "Profile Updated",
         status: "success",
       });
-      return redirect(`/user/profile`, {
+      return redirect(this.path, {
         headers: {
           "Set-Cookie": await commitFlashSession(session),
         },
@@ -271,7 +275,7 @@ export default class UserController {
         title: "Error Updating Profile!",
         status: "error",
       });
-      return redirect(`/user/profile`, {
+      return redirect(this.path, {
         headers: {
           "Set-Cookie": await commitFlashSession(session),
         },
