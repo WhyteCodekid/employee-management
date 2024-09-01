@@ -188,10 +188,10 @@ export const action: ActionFunction = async ({ request }) => {
     });
   }
 
-  if (formValues.intent === "approve-request") {
+  if (formValues.intent === "decline-request") {
     return await leaveController.changeStatus({
       id: formValues.id as string,
-      status: "rejected",
+      status: "declined",
     });
   }
 
