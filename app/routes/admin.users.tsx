@@ -132,10 +132,11 @@ export default function AdminEmployeesManagement() {
     setImageString(imageData);
     setCapturedImage(imageData);
   };
+  const { user } = useOutletContext();
 
   return (
     <div>
-      <Header title="Manage Employees" />
+      <Header user={user} title="Manage Employees" />
 
       <SearchAndCreateRecordBar
         buttonText="New Employee"
@@ -153,6 +154,7 @@ export default function AdminEmployeesManagement() {
             name="descriptor"
             value={JSON.stringify(Array.from(descriptor || []))}
           />
+          <input type="hidden" name="image" value={imageString} />
           <TextInput label="First Name" name="firstName" isRequired />
           <TextInput label="Last Name" name="lastName" isRequired />
           <TextInput label="Email" name="email" type="email" isRequired />

@@ -52,9 +52,11 @@ export default function AvaibleJobs() {
     }
   }, [flashMessage]);
 
+  const { user } = useOutletContext();
+
   return (
     <div>
-      <Header title="Applications" />
+      <Header user={user} title="Applications" />
 
       <SearchAndCreateRecordBar
         hideButton

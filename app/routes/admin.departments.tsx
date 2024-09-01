@@ -18,6 +18,7 @@ export default function AdminDepartmentsManagement() {
   }>();
   const { search_term, page, departments } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
+  const { user } = useOutletContext();
 
   // delete user stuff
   const deleteDisclosure = useDisclosure();
@@ -43,7 +44,7 @@ export default function AdminDepartmentsManagement() {
 
   return (
     <div>
-      <Header title="Manage Departments" />
+      <Header user={user} title="Manage Departments" />
 
       <SearchAndCreateRecordBar
         buttonText="New Department"

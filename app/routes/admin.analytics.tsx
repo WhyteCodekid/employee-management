@@ -1,11 +1,13 @@
-import { NavLink, Outlet } from "@remix-run/react";
+import { NavLink, Outlet, useOutletContext } from "@remix-run/react";
 import React from "react";
 import Header from "~/components/ui/header";
 
 export default function AdminAnalytics() {
+  const { user } = useOutletContext();
+
   return (
     <div>
-      <Header title="Analytics" />
+      <Header user={user} title="Analytics" />
 
       <Outlet />
     </div>
