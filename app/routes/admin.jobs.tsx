@@ -30,6 +30,7 @@ export default function AvaibleJobs() {
   const { search_term, page, jobs, totalPages } =
     useLoaderData<typeof loader>();
   const navigate = useNavigate();
+  const { user } = useOutletContext();
 
   // delete user stuff
   const deleteDisclosure = useDisclosure();
@@ -56,7 +57,7 @@ export default function AvaibleJobs() {
 
   return (
     <div>
-      <Header title="Manage Jobs" />
+      <Header user={user} title="Manage Jobs" />
 
       <SearchAndCreateRecordBar
         buttonText="New Job"

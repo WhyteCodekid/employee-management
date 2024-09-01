@@ -17,9 +17,11 @@ export default function AdminAttendanceManagement() {
     useLoaderData<typeof loader>();
   const navigate = useNavigate();
 
+  const { user } = useOutletContext();
+
   return (
     <div className="flex flex-col">
-      <Header title="View Employee Attendance" />
+      <Header user={user} title="View Employee Attendance" />
 
       <SearchAndCreateRecordBar
         buttonText="Open Face Scanner"

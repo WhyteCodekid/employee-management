@@ -8,6 +8,7 @@ export default function Header({
 }: {
   title: string;
   hideUserDropdown?: boolean;
+  user: any;
 }) {
   return (
     <div className="flex items-center justify-between h-16 bg-white dark:bg-content2 border-b dark:border-white/10 px-4 transition-colors duration-400">

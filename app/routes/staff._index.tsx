@@ -105,10 +105,7 @@ export default function AdminLayout() {
 
             <div className="flex items-start gap-4">
               <div className="rounded-full border-2 border-green-500 size-20 overflow-hidden">
-                <img
-                  src="https://i.pravatar.cc/150?u=a042581f4e29026024d"
-                  className="object-cover object-center w-full h-full"
-                />
+                <img src={user?.image} />
               </div>
 
               <div className="flex flex-col gap-1">

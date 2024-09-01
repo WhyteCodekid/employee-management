@@ -31,6 +31,7 @@ export default function AdminEmployeesManagement() {
   const { search_term, page, deductionBonus, totalPages } =
     useLoaderData<typeof loader>();
   const navigate = useNavigate();
+  const { user } = useOutletContext();
 
   // delete user stuff
   const deleteDisclosure = useDisclosure();
@@ -55,7 +56,7 @@ export default function AdminEmployeesManagement() {
 
   return (
     <div>
-      <Header title="Manage Deduction/Bonuses" />
+      <Header user={user} title="Manage Deduction/Bonuses" />
 
       <SearchAndCreateRecordBar
         buttonText="New Transaction"

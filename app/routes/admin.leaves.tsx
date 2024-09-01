@@ -30,6 +30,7 @@ export default function AdminEmployeesManagement() {
   const { search_term, page, leaves, totalPages, status } =
     useLoaderData<typeof loader>();
   const navigate = useNavigate();
+  const { user } = useOutletContext();
 
   // delete user stuff
   const approveDisclosure = useDisclosure();
@@ -48,7 +49,7 @@ export default function AdminEmployeesManagement() {
 
   return (
     <div>
-      <Header title="Employees Leave Management" />
+      <Header user={user} title="Employees Leave Management" />
 
       <div className="flex items-center justify-between py-4 px-4">
         <Input

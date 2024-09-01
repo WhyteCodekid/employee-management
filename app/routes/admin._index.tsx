@@ -1,7 +1,7 @@
 import { Button, Card } from "@nextui-org/react";
 import { useLoaderData } from "@remix-run/react";
 import moment from "moment";
-import { LoaderFunction } from "react-router";
+import { LoaderFunction, useOutletContext } from "react-router";
 import Header from "~/components/ui/header";
 import DashboardController from "~/controllers/DashboardController";
 import JobController from "~/controllers/JobController";
@@ -65,10 +65,11 @@ const chartData = [
 
 export default function AdminDashboard() {
   const { data, applications } = useLoaderData();
+  const { user } = useOutletContext();
 
   return (
     <div className="flex flex-col gap-5 h-full">
-      <Header title="Admin Dashboard" />
+      <Header user={user} title="Admin Dashboard" />
 
       <section className="grid grid-cols-4 gap-5 mx-5">
         <Card className="bg-white dark:bg-slate-800 flex flex-col rounded-xl p-4 h-32">

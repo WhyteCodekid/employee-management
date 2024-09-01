@@ -18,6 +18,8 @@ export default function AdminEmployeesManagement() {
     message: string;
     status: "error" | "success";
   }>();
+  const { user } = useOutletContext();
+
   const { search_term, page, faqs, totalPages } =
     useLoaderData<typeof loader>();
   const navigate = useNavigate();
@@ -45,7 +47,7 @@ export default function AdminEmployeesManagement() {
 
   return (
     <div>
-      <Header title="Manage Frequently Asked Questions" />
+      <Header user={user} title="Manage Frequently Asked Questions" />
 
       <SearchAndCreateRecordBar
         buttonText="New FAQ"
