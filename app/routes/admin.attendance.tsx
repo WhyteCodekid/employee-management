@@ -1,6 +1,7 @@
 import { TableCell, TableRow } from "@nextui-org/react";
 import { ActionFunction, LoaderFunction, redirect } from "@remix-run/node";
 import { useLoaderData, useNavigate, useOutletContext } from "@remix-run/react";
+import moment from "moment";
 import SearchAndCreateRecordBar from "~/components/sections/search-create-bar";
 import Header from "~/components/ui/header";
 import CustomTable from "~/components/ui/new-table";
@@ -38,35 +39,33 @@ export default function AdminAttendanceManagement() {
 
       <div className="px-4">
         <CustomTable
-          columns={[
-            "Staff ID",
-            "Staff Name",
-            "Date",
-            "Time In",
-            "Time Out",
-            "Status",
-          ]}
+          columns={["Staff ID", "Staff Name", "Time In", "Time Out"]}
           page={page}
           setPage={(page) =>
             navigate(`?page=${page}&search_term=${search_term}`)
           }
           totalPages={1}
         >
-          {attendance?.map(
-            (
-              department: { name: string; description: string },
-              index: number
-            ) => (
-              <TableRow key={index}>
-                <TableCell>{department.name}</TableCell>
-                <TableCell>{department.description}</TableCell>
-                <TableCell>{department.description}</TableCell>
-                <TableCell>{department.description}</TableCell>
-                <TableCell>{department.description}</TableCell>
-                <TableCell>{department.description}</TableCell>
-              </TableRow>
-            )
-          )}
+          {attendance?.map((department, index) => (
+            <TableRow key={index}>
+              <TableCell className="font-semibold">
+                {department?.user?.staffId}
+              </TableCell>
+              <TableCell>
+                {department?.user?.firstName} {department?.user?.lastName}
+              </TableCell>
+              <TableCell>
+                {moment(department?.checkInTime).format(
+                  "Do MMM, YYYY -  HH:mm"
+                )}
+              </TableCell>
+              <TableCell>
+                {moment(department?.checkOutTime).format(
+                  "Do MMM, YYYY - HH:mm"
+                )}
+              </TableCell>
+            </TableRow>
+          ))}
         </CustomTable>
       </div>
     </div>

@@ -166,10 +166,14 @@ const App = () => {
                 {department?.user?.firstName} {department?.user?.lastName}
               </TableCell>
               <TableCell>
-                {moment(department?.checkInTime).format("Do MMMM, YYYY")}
+                {moment(department?.checkInTime).format(
+                  "Do MMM, YYYY -  HH:mm"
+                )}
               </TableCell>
               <TableCell>
-                {moment(department?.checkOutTime).format("Do MMMM, YYYY")}
+                {moment(department?.checkOutTime).format(
+                  "Do MMM, YYYY - HH:mm"
+                )}
               </TableCell>
             </TableRow>
           ))}
