@@ -295,13 +295,7 @@ export default class AttendanceController {
         today.getDate() + 1
       );
 
-      const attendance = await Attendance.find({
-        ...searchFilter,
-        checkInTime: {
-          $gte: start,
-          $lt: end,
-        },
-      })
+      const attendance = await Attendance.find(searchFilter)
         .populate("user")
         .skip(skipCount)
         .limit(limit)
@@ -309,13 +303,9 @@ export default class AttendanceController {
           createdAt: "desc",
         });
 
-      const totalAttendancesCount = await Attendance.countDocuments({
-        ...searchFilter,
-        checkInTime: {
-          $gte: start,
-          $lt: end,
-        },
-      }).exec();
+      const totalAttendancesCount = await Attendance.countDocuments(
+        searchFilter
+      ).exec();
 
       const totalPages = Math.ceil(totalAttendancesCount / limit);
 

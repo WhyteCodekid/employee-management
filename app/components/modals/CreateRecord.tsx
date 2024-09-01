@@ -16,6 +16,7 @@ const CreateRecordModal = ({
   actionText,
   children,
   size,
+  buttonDisabled = false,
   intent,
   ...rest
 }: {
@@ -27,6 +28,7 @@ const CreateRecordModal = ({
   children?: React.ReactNode;
   size?: "sm" | "md" | "lg" | "xl";
   intent: string;
+  buttonDisabled?: boolean;
 }) => {
   // state to handle loading
   const submit = useSubmit();
@@ -122,6 +124,7 @@ const CreateRecordModal = ({
                 type="submit"
                 form="create-record-form"
                 className="font-montserrat font-medium text-white"
+                disabled={buttonDisabled}
               >
                 {actionText}
               </Button>
