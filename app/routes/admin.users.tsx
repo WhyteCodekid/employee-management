@@ -103,18 +103,20 @@ export default function AdminEmployeesManagement() {
   const canvasRef = useRef(null);
   const [capturedImage, setCapturedImage] = useState(null);
   const [buttonDisabled, setButtonDisabled] = useState(true);
-
+  const [showCam, setShowCam] = useState(false);
   useEffect(() => {
     // Access the user's camera
     navigator.mediaDevices
       .getUserMedia({ video: { facingMode: "user" } })
       .then((stream) => {
-        videoRef.current.srcObject = stream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
       })
       .catch((err) => {
         console.error("Error accessing the camera: ", err);
       });
-  }, []);
+  }, [videoRef, showCam]);
 
   const captureImage = () => {
     const context = canvasRef.current.getContext("2d");
@@ -143,6 +145,7 @@ export default function AdminEmployeesManagement() {
         formIntent="create-employee"
         flashMessage={flashMessage}
         buttonDisabled={buttonDisabled}
+        setShowCam={setShowCam}
       >
         <div className="flex flex-col gap-5">
           <input
@@ -181,6 +184,7 @@ export default function AdminEmployeesManagement() {
                 style={{ width: "100%", maxHeight: "400px" }}
                 className="mb-3"
               />
+
               <Button
                 color="primary"
                 size="sm"
