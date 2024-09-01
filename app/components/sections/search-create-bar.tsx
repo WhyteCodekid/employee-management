@@ -12,6 +12,7 @@ export default function SearchAndCreateRecordBar({
   pageValue,
   flashMessage,
   hideButton = false,
+  buttonDisabled,
 }: {
   buttonText?: string;
   children: ReactNode;
@@ -21,6 +22,7 @@ export default function SearchAndCreateRecordBar({
   pageValue?: number;
   flashMessage: { message: string; status: "error" | "success" };
   hideButton?: boolean;
+  buttonDisabled?: boolean;
 }) {
   const createRecordDisclosure = useDisclosure();
   const navigate = useNavigate();
@@ -66,6 +68,7 @@ export default function SearchAndCreateRecordBar({
         actionText="Submit"
         size="lg"
         intent={formIntent}
+        buttonDisabled={buttonDisabled}
       >
         {children}
       </CreateRecordModal>

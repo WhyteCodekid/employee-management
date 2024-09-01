@@ -9,7 +9,7 @@ import {
 } from "@nextui-org/react";
 import { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { useLoaderData, useNavigate, useOutletContext } from "@remix-run/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ImageInputWithPreview } from "~/components/inputs/image";
 import CustomSelect from "~/components/inputs/select";
 import TextInput from "~/components/inputs/text-input";
@@ -94,9 +94,42 @@ export default function AdminEmployeesManagement() {
           //   .catch((error) => console.error("Error:", error));
         }
         setProcessingImage(false);
+        setButtonDisabled(false);
       };
     }
   }, [imageString]);
+
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const [capturedImage, setCapturedImage] = useState(null);
+  const [buttonDisabled, setButtonDisabled] = useState(true);
+
+  useEffect(() => {
+    // Access the user's camera
+    navigator.mediaDevices
+      .getUserMedia({ video: { facingMode: "user" } })
+      .then((stream) => {
+        videoRef.current.srcObject = stream;
+      })
+      .catch((err) => {
+        console.error("Error accessing the camera: ", err);
+      });
+  }, []);
+
+  const captureImage = () => {
+    const context = canvasRef.current.getContext("2d");
+    context.drawImage(
+      videoRef.current,
+      0,
+      0,
+      canvasRef.current.width,
+      canvasRef.current.height
+    );
+    const imageData = canvasRef.current.toDataURL("image/png");
+    console.log(imageData);
+    setImageString(imageData);
+    setCapturedImage(imageData);
+  };
 
   return (
     <div>
@@ -109,6 +142,7 @@ export default function AdminEmployeesManagement() {
         pageValue={page}
         formIntent="create-employee"
         flashMessage={flashMessage}
+        buttonDisabled={buttonDisabled}
       >
         <div className="flex flex-col gap-5">
           <input
@@ -137,12 +171,48 @@ export default function AdminEmployeesManagement() {
           <TextInput label="Password" name="password" type="text" isRequired />
 
           {processingImage && <p>Processing image...</p>}
-          <ImageInputWithPreview
+
+          <div className="flex gap-3">
+            <div>
+              <h3>Preview:</h3>
+              <video
+                ref={videoRef}
+                autoPlay
+                style={{ width: "100%", maxHeight: "400px" }}
+                className="mb-3"
+              />
+              <Button
+                color="primary"
+                size="sm"
+                type="button"
+                onClick={captureImage}
+              >
+                Capture Image
+              </Button>
+            </div>
+
+            <div>
+              <canvas
+                ref={canvasRef}
+                style={{ display: "none" }}
+                width={640}
+                height={480}
+              ></canvas>
+              {capturedImage && (
+                <div>
+                  <h3>Captured Image:</h3>
+                  <img src={capturedImage} alt="Captured" />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* <ImageInputWithPreview
             name="image"
             imageString={imageString}
             setImageString={setImageString}
             label="Passport Picture"
-          />
+          /> */}
         </div>
       </SearchAndCreateRecordBar>
 
@@ -268,12 +338,12 @@ export default function AdminEmployeesManagement() {
             type="number"
             isRequired
           />
-          <ImageInputWithPreview
+          {/* <ImageInputWithPreview
             name="image"
             imageString={imageString}
             setImageString={setImageString}
             label="Passport Picture"
-          />
+          /> */}
         </div>
       </EditRecordModal>
 
