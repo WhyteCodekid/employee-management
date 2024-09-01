@@ -13,6 +13,7 @@ export default function SearchAndCreateRecordBar({
   flashMessage,
   hideButton = false,
   buttonDisabled,
+  setShowCam,
 }: {
   buttonText?: string;
   children: ReactNode;
@@ -23,6 +24,7 @@ export default function SearchAndCreateRecordBar({
   flashMessage: { message: string; status: "error" | "success" };
   hideButton?: boolean;
   buttonDisabled?: boolean;
+  setShowCam: () => void;
 }) {
   const createRecordDisclosure = useDisclosure();
   const navigate = useNavigate();
@@ -53,7 +55,10 @@ export default function SearchAndCreateRecordBar({
       {!hideButton && (
         <Button
           color="success"
-          onPress={() => createRecordDisclosure.onOpen()}
+          onPress={() => {
+            createRecordDisclosure.onOpen();
+            setShowCam();
+          }}
           className="font-montserrat text-white font-semibold"
         >
           {buttonText}
