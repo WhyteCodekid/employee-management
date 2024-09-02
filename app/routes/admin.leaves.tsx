@@ -88,17 +88,16 @@ export default function AdminEmployeesManagement() {
           {leaves?.map((leave: LeaveInterface, index: number) => (
             <TableRow key={index}>
               <TableCell>
-                {leave.user.firstName} {leave.user.lastName}
+                {leave?.user?.firstName} {leave?.user?.lastName}
               </TableCell>
-              <TableCell>{leave.type}</TableCell>
+              <TableCell>{leave?.type}</TableCell>
               <TableCell>
-                {moment(leave.startDate).format("DD/MM/YYYY")}
-              </TableCell>
-              <TableCell>
-                {moment(leave.endDate).format("DD/MM/YYYY")}
+                {moment(leave?.startDate).format("DD/MM/YYYY")}
               </TableCell>
               <TableCell>
-                {" "}
+                {moment(leave?.endDate).format("DD/MM/YYYY")}
+              </TableCell>
+              <TableCell>
                 <Chip
                   size="sm"
                   className="font-quicksand font-semibold capitalize"
